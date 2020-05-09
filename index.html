@@ -9,32 +9,61 @@
     			text-align: center;
     		}
     		.header {
-			  padding: 20px;
+			  padding: 16px;
 			  text-align: left;
-			  background: #91bfdb;
-			  color: white;
+			  background: #ff6666;
+			  color: black;
 			  font-size: 20px;
 			}
 			.footer {
 			  padding: 20px;
 			  text-align: center;
-			  background: #91bfdb;
-			  color: white;
+			  background: #ff6666;
+			  color: black;
 			  font-size: 20px;
 			}
+			.topnav {
+			  overflow: hidden;
+			  background-color: #ff6666;
+			  position: fixed;
+			  top: 0;
+			  width: 100%; /* Full width */
+			}
+			.topnav a {
+			  float: left;
+			  color: black;
+			  text-align: center;
+			  padding: 10px 16px;
+			  text-decoration: none;
+			  font-size: 14px;
+			}
+			.topnav a:hover {
+			  background-color: #ddd;
+			  color: black;
+			}
+
+
 		</style>
     </head>
     
     <body>
     	<header>
-			<div class="header"> 
+			<div class="topnav">
+			  <a class="active" href="index.html"><b>Home</b></a>
+			  <a href="#bio"><b>Bio</b></a>
+			  <a href="#publications"><b>Publications</b></a>
+			  <a href="#music"><b>Music</b></a>
 			</div>
+
+
 		</header>
-        
+        			<br>			<br>
         <table cellspacing="10">
             <tr>
                 <td><img border="0" src="img/foto.jpeg" width="256"></td>
-                <td width="650"><b><font color="#000000" face="verdana" size="4"> Carlos Eduardo Leal de Castro, MsC.
+                <td width="650"><b><font color="#000000" face="verdana" size="4"> <img src="img/logo.eps" width="15%"> 
+                	<p></p>
+                	Carlos Eduardo Leal de Castro, MsC.
 					<p></p>
                 	Thank you for visiting my website.
                     <p></p>
@@ -51,10 +80,12 @@
             </tr>
         </table>
        
-    <p><font size="3" face="verdana"><b>Bio</b></font></p>
+    <p><font size="3" face="verdana"><a name="bio"><b>Bio</b></a></font></p>
     <p><font size="3" face="verdana">PhD candidate in the Computer Science Graduate Program, Institute of Mathematics and Statistics, University of São Paulo. Master in Pure and Applied Mathematics at Federal University of Santa Catarina. Graduated in mathematics at Federal University of Santa Catarina.</font> <br> 
     	<br> Research areas: image processing, geometry processing, music technology, music programming.
     	<br> Member of <a href="http://compmus.ime.usp.br/pt-br/inicial" target="_blank"> Computer Music Research Group</a> - USP.</p> 
+
+    <a name="publications"></a>
     
     <p><font size="3" face="verdana"><b>Master Thesis</b></font></p>
     <p><b>Title:</b> Optimal rotations for overhang reduction</p>
@@ -84,7 +115,7 @@
     	<br>
     </ul>
 
-    <p><font size="3" face="verdana"><b>Music</b></font></p>
+    <p><font size="3" face="verdana"><a name="music"><b>Music</b></a></font></p>
 
         <table cellspacing="10">
             <tr>
