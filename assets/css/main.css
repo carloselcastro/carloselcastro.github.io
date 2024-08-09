@@ -1007,6 +1007,10 @@ header.major > :last-child {
 header.main > :last-child {
   margin: 0 0 1em 0; }
 
+.line_purple{
+  border-bottom: solid 3px #884ea0;
+}
+
 /* Form */
 form {
   margin: 0 0 2em 0; }
@@ -2289,4 +2293,84 @@ iframe.instagram-media {
     max-width: 100% !important;
     width: 100% !important;
     min-width: auto !important;
+}
+
+
+/* AudiosDB */
+
+  /* Odery Note */
+#oderyP {
+border: 0.1px solid #884ea0;
+border-radius: 13px;
+}
+
+#oderyP i{color: #8e44a4;}
+
+#oderyImg {
+  width: 15vw;
+  height: auto;
+  max-width: 100%;
+  margin-left: 1vw;
+  vertical-align: middle;
+  padding: 0.6vw 0 0.6vw 0px;
+
+}
+
+  /* Tables */
+
+.containerDb {
+  width: 100%;
+  margin-top: -7vh;
+}
+
+#loadMoreButton2, #loadMoreButton3, #loadLessButton2, #loadLessButton3 {
+  background-color: #8e44ad;
+  color: white !important;
+  border-radius: 99px;
+  box-shadow: none;
+  margin-right: 10px;
+}
+
+#loadMoreButton2:hover, #loadMoreButton3:hover, #loadLessButton2:hover, #loadLessButton3:hover {
+  background-color: rgb(209, 209, 37);
+}
+
+.containerDb table th {
+  color: #8e44ad;
+  font-size: 16px;
+  padding-top: 10px;
+}
+
+thead {
+  box-shadow: 0px 1px 0.2rem 0.1rem rgb(201, 201, 201);
+}
+
+/* thead th {
+  border-top: 2px solid #8e44ad;
+  border-bottom: 2px solid #8e44ad;
+}
+
+thead th:first-child{
+  border-left: 2px solid #8e44ad;
+}
+thead th:last-child{
+  border-right: 2px solid #8e44ad;
+} */
+
+tr:hover {
+  color: #5d0583;
+  box-shadow: 0px 1px 0.2rem 0.1rem rgb(201, 201, 201); 
+}
+
+tr {
+  font-size: 1em;
+}
+
+.download-icon {
+  color: #8e44ad;
+  transition: color 0.3s ease;
+}
+
+.download-icon.active {
+  color: rgb(209, 209, 37);
 }

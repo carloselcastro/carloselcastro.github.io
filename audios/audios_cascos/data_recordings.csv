@@ -1,0 +1,6 @@
+name_file,wood,thick,f0,tension_att,tension_res,anel_ref,drumskin_att,drumskin_res,hoop,recorded
+0001.wav,copaiba,"5,5",147,NaN,NaN,True,False,False,False,True
+0002.wav,teca,"5,5",120,NaN,NaN,False,False,False,False,True
+0003.wav,teca,"8,5",171,NaN,NaN,False,False,False,False,True
+0004.wav,teca,"5,5",159,NaN,NaN,True,False,False,False,True
+0005.wav,araucaria,"5,5",167,NaN,NaN,True,False,False,False,True
