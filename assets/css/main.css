@@ -2320,7 +2320,10 @@ border-radius: 13px;
 
 .containerDb {
   width: 100%;
+  height: auto;
   margin-top: -7vh;
+  /* align-items: center;
+  justify-content: center; */
 }
 
 #loadMoreButton2, #loadMoreButton3, #loadLessButton2, #loadLessButton3 {
