@@ -2307,12 +2307,12 @@ border-radius: 13px;
 #oderyP i{color: #8e44a4;}
 
 #oderyImg {
-  width: 15vw;
+  width: 18em;
   height: auto;
-  max-width: 100%;
-  margin-left: 1vw;
+  max-width: 50%;
+  margin-left: 1rem;
   vertical-align: middle;
-  padding: 0.6vw 0 0.6vw 0px;
+  padding: 0.6rem 0 0.6rem 0px;
 
 }
 
