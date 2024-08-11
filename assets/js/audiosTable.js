@@ -166,4 +166,3 @@ document.addEventListener('DOMContentLoaded', function () {
     loadTable("/audios/audios_Teste_aparatus_database/data_recordings.csv", "audioTable2");
     loadTable("/audios/audio_tambores/data_recordings.csv", "audioTable3");
 });
-// audios/audio_tambores/0001.wav
