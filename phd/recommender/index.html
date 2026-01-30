@@ -88,9 +88,9 @@
         const CATALOG_URL = DATA_BASE_URL + "catalog.json";
         const MODEL_URL = DATA_BASE_URL + "model.json";
         const AUDIO_BASE_URL = DATA_BASE_URL + "audio_tambores/";
-        
+
         const WINDOW_SIZE = 2048, HOP_LENGTH = 1024, TAX = 0.001;
-        
+
         const NORM_PARAMS = {
             "RMS": { median: 0.07596126943826675, iqr: 0.16582938143983483 },
             "Spectral Flatness": { median: 0.02321663685142994, iqr: 0.021487520076334476 },
@@ -101,7 +101,7 @@
             "Inharmonicity": { median: 105394.11599057174, iqr: 66925.98083425332 },
             "Effective Duration": { median: 1.0100680272108844, iqr: 0.6501587301587303 }
         };
-        
+
         const FEATURE_INFO = {
             "RMS": { label: "Energy (RMS)", description: "Overall loudness and power of the sound. Higher values indicate a more powerful, projecting drum sound.", lowDesc: "Soft, delicate", highDesc: "Powerful, loud" },
             "Spectral Flatness": { label: "Noisiness", description: "How noise-like vs tonal the sound is. Higher values indicate more percussive attack noise, lower values a cleaner tone.", lowDesc: "Clean, tonal", highDesc: "Noisy, textured" },
@@ -112,7 +112,7 @@
             "Inharmonicity": { label: "Pitch Clarity", description: "How clearly a fundamental pitch is perceived. Lower values give a clearer pitch sense.", lowDesc: "Clear pitch", highDesc: "Complex, bell-like" },
             "Effective Duration": { label: "Sustain", description: "How long the sound rings out. Higher values indicate longer sustain and resonance.", lowDesc: "Tight, controlled", highDesc: "Long, resonant" }
         };
-        
+
         function getLevel(v) {
             if (v <= -2) return { text: "Very Low", class: "very-low" };
             if (v <= -0.5) return { text: "Low", class: "low" };
@@ -120,49 +120,49 @@
             if (v <= 2) return { text: "High", class: "high" };
             return { text: "Very High", class: "very-high" };
         }
-        
+
         // Math utilities
         const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
         const matVec = (m, v) => m.map(r => dot(r, v));
         const vecSub = (a, b) => a.map((v, i) => v - b[i]);
         const norm2Sq = arr => arr.reduce((s, v) => s + v * v, 0);
         const mahal = (x, mean, prec) => { const d = vecSub(x, mean); return Math.sqrt(Math.max(0, dot(d, matVec(prec, d)))); };
-        
+
         // Audio processing functions
         function createHann(size) { const w = new Float32Array(size); for (let i = 0; i < size; i++) w[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (size - 1))); return w; }
-        
+
         function windowSignal(sig, ws, hl) {
             const nw = Math.floor(1 + (sig.length - ws) / hl), hann = createHann(ws), wins = [];
             for (let i = 0; i < nw; i++) { const s = i * hl, w = new Float32Array(ws); for (let j = 0; j < ws; j++) w[j] = sig[s + j] * hann[j]; wins.push(w); }
             return wins;
         }
-        
+
         function rfft(sig) {
             const N = sig.length, nb = Math.floor(N / 2) + 1, mag = new Float32Array(nb);
             for (let k = 0; k < nb; k++) { let re = 0, im = 0; for (let n = 0; n < N; n++) { const a = -2 * Math.PI * k * n / N; re += sig[n] * Math.cos(a); im += sig[n] * Math.sin(a); } mag[k] = Math.sqrt(re * re + im * im); }
             return mag;
         }
-        
+
         function rfftFreq(ws, sr) { const nb = Math.floor(ws / 2) + 1, f = new Float32Array(nb); for (let i = 0; i < nb; i++) f[i] = i * sr / ws; return f; }
-        
+
         const computeRMS = wins => norm2Sq(wins.map(w => Math.sqrt(w.reduce((s, v) => s + v * v, 0) / w.length)));
         const computeSF = wins => norm2Sq(wins.map(w => { const m = rfft(w), gm = Math.exp(m.reduce((s, v) => s + Math.log(v + 1e-10), 0) / m.length), am = m.reduce((s, v) => s + v, 0) / m.length; return gm / (am + 1e-10); }));
         const computeZCR = wins => norm2Sq(wins.map(w => { let c = 0; for (let i = 1; i < w.length; i++) if ((w[i] >= 0 && w[i-1] < 0) || (w[i] < 0 && w[i-1] >= 0)) c++; return c / (2 * w.length); }));
-        
+
         function computeSC(mag, freqs) { const sm = mag.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let ws = 0; for (let i = 0; i < mag.length; i++) ws += freqs[i] * mag[i]; return ws / sm; }
         function computeSS(mag, freqs, sc) { const sm = mag.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let ws = 0; for (let i = 0; i < mag.length; i++) { const d = freqs[i] - sc; ws += d * d * mag[i]; } return Math.sqrt(ws / sm); }
-        
+
         function computeSK(wins, sr) {
             const freqs = rfftFreq(wins[0].length, sr);
             return norm2Sq(wins.map(w => { const m = rfft(w), sc = computeSC(m, freqs), ss = computeSS(m, freqs, sc); if (ss < 1e-10) return 0; const sm = m.reduce((s, v) => s + v, 0); let w4 = 0; for (let i = 0; i < m.length; i++) w4 += Math.pow(freqs[i] - sc, 4) * m[i]; return w4 / (Math.pow(ss, 4) * sm + 1e-10); }));
         }
-        
+
         const computeSE = wins => norm2Sq(wins.map(w => { const m = rfft(w), sm = m.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let e = 0; for (let i = 0; i < m.length; i++) { const p = m[i] / sm; if (p > 1e-10) e -= p * Math.log2(p); } return e; }));
-        
+
         function computeSSl(wins) {
             return norm2Sq(wins.map(w => { const m = rfft(w), M = m.length, sm = m.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let sn = 0, snm = 0, sn2 = 0; for (let n = 0; n < M; n++) { sn += n; snm += n * m[n]; sn2 += n * n; } const num = M * snm - sn * sm, den = M * sn2 - sn * sn; return Math.abs(den) < 1e-10 ? 0 : (1 / sm) * num / den; }));
         }
-        
+
         function computeF0(sig, sr) {
             const N = sig.length, ac = new Float32Array(N), ma = Math.max(...sig.map(Math.abs)), norm = sig.map(v => v / (ma + 1e-10)), en = norm.reduce((s, v) => s + v * v, 0);
             for (let l = 0; l < N; l++) { let s = 0; for (let i = 0; i < N - l; i++) s += norm[i] * norm[i + l]; ac[l] = s / en; }
@@ -170,12 +170,12 @@
             for (let i = minL; i < Math.min(maxL, N); i++) if (ac[i] > mv && ac[i] > 0.01 && i > 0 && i < N - 1 && ac[i] > ac[i-1] && ac[i] > ac[i+1]) { mv = ac[i]; mi = i; }
             return mi > 0 ? sr / mi : 100;
         }
-        
+
         function computeInh(wins, sr, f0) {
             const freqs = rfftFreq(wins[0].length, sr);
             return norm2Sq(wins.map(w => { const m = rfft(w), msq = m.map(v => v * v), smsq = msq.reduce((s, v) => s + v, 0); if (smsq < 1e-10 || f0 < 1e-10) return 0; let ws = 0; for (let h = 0; h < m.length; h++) ws += (freqs[h] - h * f0) * msq[h]; return (2 / f0) * ws / smsq; }));
         }
-        
+
         function computeED(sig, sr, ws, hl) {
             const nw = Math.floor(1 + (sig.length - ws) / hl), en = [];
             for (let i = 0; i < nw; i++) { const s = i * hl; let e = 0; for (let j = 0; j < ws && s + j < sig.length; j++) e += sig[s + j] * sig[s + j]; en.push(e); }
@@ -183,40 +183,40 @@
             for (let i = mi; i < en.length; i++) if (en[i] < th) { ei = i * hl; break; }
             return ei / sr;
         }
-        
+
         function extractFeatures(data, sr) {
             const wins = windowSignal(data, WINDOW_SIZE, HOP_LENGTH), f0 = computeF0(data, sr);
             const raw = { "RMS": computeRMS(wins), "Spectral Flatness": computeSF(wins), "ZCR": computeZCR(wins), "Spectral Kurtosis": computeSK(wins, sr), "Spectral Entropy": computeSE(wins), "Spectral Slope": computeSSl(wins), "Inharmonicity": computeInh(wins, sr, f0), "Effective Duration": computeED(data, sr, WINDOW_SIZE, HOP_LENGTH) };
             const norm = {}; for (const [k, v] of Object.entries(raw)) { const { median, iqr } = NORM_PARAMS[k]; norm[k] = iqr !== 0 ? (v - median) / iqr : (v - median); }
             return { raw, normalized: norm, f0 };
         }
-        
+
         // Model functions
         function computeResidual(aVec, zVec, model) {
             const zStd = zVec.map((z, i) => (z - model.resid_params.z_mean[i]) / model.resid_params.z_std[i]);
             const aPred = model.resid_params.intercept.map((int, i) => int + dot(zStd, model.resid_params.coef[i]));
             return vecSub(aVec, aPred);
         }
-        
+
         function rankConfigs(queryA, queryZ, catalog, model) {
             const A_COLS = model.a_stats.columns, Z_COLS = model.resid_params.z_columns;
             const qResid = computeResidual(queryA, queryZ, model);
-            const groups = {}; 
+            const groups = {};
             catalog.forEach(item => { if (!groups[item.config_id]) groups[item.config_id] = []; groups[item.config_id].push(item); });
             const scores = Object.entries(groups).map(([cid, samples]) => {
-                const dists = samples.map(s => { 
-                    const sA = A_COLS.map(c => s[c]), sZ = Z_COLS.map(c => s[c]), sR = computeResidual(sA, sZ, model); 
-                    return mahal(qResid, sR, model.mahal_params.precision); 
+                const dists = samples.map(s => {
+                    const sA = A_COLS.map(c => s[c]), sZ = Z_COLS.map(c => s[c]), sR = computeResidual(sA, sZ, model);
+                    return mahal(qResid, sR, model.mahal_params.precision);
                 });
-                const minD = Math.min(...dists); 
+                const minD = Math.min(...dists);
                 return { config_id: parseInt(cid), distance: minD, sample: samples[dists.indexOf(minD)] };
             });
-            scores.sort((a, b) => a.distance - b.distance); 
+            scores.sort((a, b) => a.distance - b.distance);
             return scores;
         }
-        
+
         const { useState, useEffect, useRef } = React;
-        
+
         function App() {
             const [catalog, setCatalog] = useState(null);
             const [model, setModel] = useState(null);
@@ -230,7 +230,7 @@
             const [isProcessing, setIsProcessing] = useState(false);
             const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
             const audioRef = useRef(null);
-            
+
             // Load data on mount
             useEffect(() => {
                 async function loadData() {
@@ -238,20 +238,20 @@
                         const [catRes, modRes] = await Promise.all([fetch(CATALOG_URL), fetch(MODEL_URL)]);
                         if (!catRes.ok || !modRes.ok) throw new Error('Failed to load data from server');
                         const catData = await catRes.json(), modData = await modRes.json();
-                        setCatalog(catData); 
+                        setCatalog(catData);
                         setModel(modData);
-                        const init = {}; modData.a_stats.columns.forEach(c => { init[c] = 0; }); 
+                        const init = {}; modData.a_stats.columns.forEach(c => { init[c] = 0; });
                         setSliderValues(init);
                         setLoadingData(false);
-                    } catch (e) { 
+                    } catch (e) {
                         console.error('Load error:', e);
-                        setLoadError(e.message); 
-                        setLoadingData(false); 
+                        setLoadError(e.message);
+                        setLoadingData(false);
                     }
                 }
                 loadData();
             }, []);
-            
+
             // Update results when inputs change
             useEffect(() => {
                 if (!catalog || !model) return;
@@ -262,11 +262,11 @@
                 } else if (activeTab === 'design') {
                     const qA = A_COLS.map(c => sliderValues[c] || 0), qZ = [70, 70];
                     setResults(rankConfigs(qA, qZ, catalog, model));
-                } else { 
-                    setResults([]); 
+                } else {
+                    setResults([]);
                 }
             }, [activeTab, sliderValues, uploadedFeatures, catalog, model]);
-            
+
             const handleFileUpload = async (file) => {
                 setIsProcessing(true); setUploadedFeatures(null); setResults([]);
                 try {
@@ -275,23 +275,23 @@
                     const buf = await ac.decodeAudioData(ab);
                     setUploadedAudioUrl(URL.createObjectURL(file));
                     setUploadedFeatures(extractFeatures(Array.from(buf.getChannelData(0)), buf.sampleRate));
-                } catch (e) { 
-                    alert('Error processing audio file.'); 
+                } catch (e) {
+                    alert('Error processing audio file.');
                 }
                 setIsProcessing(false);
             };
-            
+
             const playAudio = (fn) => {
-                if (playingAudio === fn) { 
-                    audioRef.current?.pause(); 
-                    setPlayingAudio(null); 
-                } else { 
-                    audioRef.current.src = fn.startsWith('blob:') ? fn : AUDIO_BASE_URL + fn; 
-                    audioRef.current.play(); 
-                    setPlayingAudio(fn); 
+                if (playingAudio === fn) {
+                    audioRef.current?.pause();
+                    setPlayingAudio(null);
+                } else {
+                    audioRef.current.src = fn.startsWith('blob:') ? fn : AUDIO_BASE_URL + fn;
+                    audioRef.current.play();
+                    setPlayingAudio(fn);
                 }
             };
-            
+
             // Loading screen
             if (loadingData) {
                 return (
@@ -301,7 +301,7 @@
                     </div>
                 );
             }
-            
+
             // Error screen
             if (loadError) {
                 return (
@@ -314,7 +314,7 @@
                     </div>
                 );
             }
-            
+
             // Safety check
             if (!model || !catalog) {
                 return (
@@ -324,33 +324,33 @@
                     </div>
                 );
             }
-            
+
             const A_COLS = model.a_stats.columns;
-            
+
             return (
                 <div className="container">
                     <header>
                         <h1>Drum Timbre Recommender</h1>
                         <p className="subtitle">Find drum configurations matching your desired timbre characteristics</p>
                     </header>
-                    
+
                     <div className="tabs">
                         <button className={`tab ${activeTab === 'upload' ? 'active' : ''}`} onClick={() => setActiveTab('upload')}>Upload Audio</button>
                         <button className={`tab ${activeTab === 'design' ? 'active' : ''}`} onClick={() => setActiveTab('design')}>Design Timbre</button>
                     </div>
-                    
+
                     {activeTab === 'upload' && (
-                        <UploadPanel 
-                            onFileUpload={handleFileUpload} 
-                            isProcessing={isProcessing} 
-                            uploadedFeatures={uploadedFeatures} 
-                            uploadedAudioUrl={uploadedAudioUrl} 
-                            playAudio={playAudio} 
-                            playingAudio={playingAudio} 
-                            A_COLS={A_COLS} 
+                        <UploadPanel
+                            onFileUpload={handleFileUpload}
+                            isProcessing={isProcessing}
+                            uploadedFeatures={uploadedFeatures}
+                            uploadedAudioUrl={uploadedAudioUrl}
+                            playAudio={playAudio}
+                            playingAudio={playingAudio}
+                            A_COLS={A_COLS}
                         />
                     )}
-                    
+
                     {activeTab === 'design' && (
                         <div className="panel">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -358,9 +358,9 @@
                                 <button className="reset-btn" onClick={() => { const r = {}; A_COLS.forEach(c => { r[c] = 0; }); setSliderValues(r); }}>Reset All</button>
                             </div>
                             <div className="sliders-grid">
-                                {A_COLS.map(col => { 
-                                    const info = FEATURE_INFO[col]; 
-                                    const lv = getLevel(sliderValues[col] || 0); 
+                                {A_COLS.map(col => {
+                                    const info = FEATURE_INFO[col];
+                                    const lv = getLevel(sliderValues[col] || 0);
                                     return (
                                         <div key={col} className="slider-item">
                                             <div className="slider-header">
@@ -371,7 +371,7 @@
                                             <input type="range" min="-3" max="3" step="0.1" value={sliderValues[col] || 0} onChange={e => setSliderValues(p => ({ ...p, [col]: parseFloat(e.target.value) }))} />
                                             <div className="slider-scale"><span>{info ? info.lowDesc : ''}</span><span>{info ? info.highDesc : ''}</span></div>
                                         </div>
-                                    ); 
+                                    );
                                 })}
                             </div>
                             <div className="method-info">
@@ -379,42 +379,42 @@
                             </div>
                         </div>
                     )}
-                    
+
                     {results.length > 0 && (
                         <div className="panel">
                             <div className="panel-title">Closest Matching Configurations</div>
                             <div className="results-grid">
                                 {results.slice(0, 3).map((r, i) => (
-                                    <ResultCard 
-                                        key={r.config_id} 
-                                        result={r} 
-                                        rank={i + 1} 
-                                        maxDistance={results[results.length - 1].distance} 
-                                        playAudio={playAudio} 
-                                        playingAudio={playingAudio} 
+                                    <ResultCard
+                                        key={r.config_id}
+                                        result={r}
+                                        rank={i + 1}
+                                        maxDistance={results[results.length - 1].distance}
+                                        playAudio={playAudio}
+                                        playingAudio={playingAudio}
                                     />
                                 ))}
                             </div>
                         </div>
                     )}
-                    
+
                     <audio ref={audioRef} onEnded={() => setPlayingAudio(null)} />
                     <footer>
                         <p>PhD Thesis Demo — Carlos Eduardo Leal de Castro<br/>
-                        <a href="https://www.ime.usp.br/~carlos.castro/phd" target="_blank">Timbre discrimination in drum tom-toms</a> | IME-USP, 2024</p>
+                        <a href="https://www.ime.usp.br/~carlos.castro/phd" target="_blank">Timbre discrimination in drum tom-toms</a> | IME-USP, 2026</p>
                     </footer>
                 </div>
             );
         }
-        
+
         function UploadPanel({ onFileUpload, isProcessing, uploadedFeatures, uploadedAudioUrl, playAudio, playingAudio, A_COLS }) {
             const [isDragOver, setIsDragOver] = useState(false);
             const fileInputRef = useRef(null);
-            
+
             return (
                 <div className="panel">
                     <div className="panel-title">Upload Your Drum Recording</div>
-                    <div 
+                    <div
                         className={`upload-zone ${isDragOver ? 'dragover' : ''}`}
                         onDrop={e => { e.preventDefault(); setIsDragOver(false); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('audio/')) onFileUpload(f); }}
                         onDragOver={e => { e.preventDefault(); setIsDragOver(true); }}
@@ -426,21 +426,21 @@
                         <div className="upload-hint">Supports WAV, MP3, OGG, and other audio formats</div>
                         <input ref={fileInputRef} type="file" accept="audio/*" className="upload-input" onChange={e => { const f = e.target.files[0]; if (f) onFileUpload(f); }} />
                     </div>
-                    
+
                     {isProcessing && (
                         <div className="processing-status">
                             <div className="processing-spinner"></div>
                             <span>Extracting audio features...</span>
                         </div>
                     )}
-                    
+
                     {uploadedFeatures && A_COLS && (
                         <div className="extracted-features">
                             <div className="extracted-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span>Extracted Features</span>
                                 {uploadedAudioUrl && (
-                                    <button 
-                                        className={`play-btn ${playingAudio === uploadedAudioUrl ? 'playing' : ''}`} 
+                                    <button
+                                        className={`play-btn ${playingAudio === uploadedAudioUrl ? 'playing' : ''}`}
                                         onClick={() => playAudio(uploadedAudioUrl)}
                                     >
                                         {playingAudio === uploadedAudioUrl ? 'Stop' : 'Play'}
@@ -448,15 +448,15 @@
                                 )}
                             </div>
                             <div className="features-grid">
-                                {A_COLS.map(col => { 
-                                    const info = FEATURE_INFO[col]; 
-                                    const lv = getLevel(uploadedFeatures.normalized[col] || 0); 
+                                {A_COLS.map(col => {
+                                    const info = FEATURE_INFO[col];
+                                    const lv = getLevel(uploadedFeatures.normalized[col] || 0);
                                     return (
                                         <div key={col} className="feature-item">
                                             <div className="feature-name">{info ? info.label : col}</div>
                                             <span className={`slider-level ${lv.class}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem' }}>{lv.text}</span>
                                         </div>
-                                    ); 
+                                    );
                                 })}
                             </div>
                             <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#71717a' }}>
@@ -464,18 +464,18 @@
                             </div>
                         </div>
                     )}
-                    
+
                     <div className="method-info">
                         Upload a recording of a drum hit. The system will extract acoustic features and find similar configurations in our database of 144 tom-tom recordings.
                     </div>
                 </div>
             );
         }
-        
+
         function ResultCard({ result, rank, maxDistance, playAudio, playingAudio }) {
             const s = result.sample;
             const score = Math.max(0, Math.min(100, (1 - result.distance / (maxDistance * 1.2)) * 100));
-            
+
             return (
                 <div className={`result-card rank-${rank}`}>
                     <div className="rank-badge">{rank}</div>
@@ -491,8 +491,8 @@
                     <div className="score-bar"><div className="score-fill" style={{ width: `${score}%` }}></div></div>
                     <div className="score-text">Similarity distance: {result.distance.toFixed(3)}</div>
                     <div className="audio-player">
-                        <button 
-                            className={`play-btn ${playingAudio === s.name_file ? 'playing' : ''}`} 
+                        <button
+                            className={`play-btn ${playingAudio === s.name_file ? 'playing' : ''}`}
                             onClick={() => playAudio(s.name_file)}
                         >
                             {playingAudio === s.name_file ? 'Stop' : 'Play Sample'}
@@ -501,7 +501,7 @@
                 </div>
             );
         }
-        
+
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
