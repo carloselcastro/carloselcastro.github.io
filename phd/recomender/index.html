@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drum Timbre Recommender | PhD Thesis Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height: 100vh; color: #e4e4e7; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+        .subtitle { color: #a1a1aa; font-size: 1rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 12px; }
+        .tab { flex: 1; padding: 0.875rem 1.5rem; border: none; background: transparent; color: #a1a1aa; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .tab:hover { background: rgba(255,255,255,0.05); color: #e4e4e7; }
+        .tab.active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
+        .panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .panel-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #f4f4f5; }
+        .sliders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem; }
+        .slider-item { background: rgba(0,0,0,0.2); padding: 1rem 1.25rem; border-radius: 10px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .slider-label { font-size: 0.9rem; font-weight: 600; color: #f4f4f5; margin-bottom: 0.25rem; }
+        .slider-description { font-size: 0.75rem; color: #a1a1aa; line-height: 1.4; margin-bottom: 0.75rem; }
+        .slider-level { font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 4px; white-space: nowrap; }
+        .slider-level.very-low { color: #60a5fa; background: rgba(96, 165, 250, 0.15); }
+        .slider-level.low { color: #34d399; background: rgba(52, 211, 153, 0.15); }
+        .slider-level.neutral { color: #fbbf24; background: rgba(251, 191, 36, 0.15); }
+        .slider-level.high { color: #fb923c; background: rgba(251, 146, 60, 0.15); }
+        .slider-level.very-high { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+        .slider-scale { display: flex; justify-content: space-between; font-size: 0.65rem; color: #71717a; margin-top: 0.4rem; }
+        input[type="range"] { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; appearance: none; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 50%; cursor: pointer; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+        .result-card { background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem; position: relative; transition: transform 0.2s; }
+        .result-card:hover { transform: translateY(-2px); }
+        .result-card.rank-1 { border-color: #fbbf24; background: linear-gradient(145deg, rgba(251,191,36,0.15), rgba(251,191,36,0.02)); }
+        .result-card.rank-2 { border-color: #9ca3af; }
+        .result-card.rank-3 { border-color: #b45309; }
+        .rank-badge { position: absolute; top: -10px; right: 1rem; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .rank-1 .rank-badge { background: #fbbf24; color: #1a1a2e; }
+        .rank-2 .rank-badge { background: #9ca3af; color: #1a1a2e; }
+        .rank-3 .rank-badge { background: #b45309; color: white; }
+        .config-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; color: #f4f4f5; }
+        .config-details { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+        .detail-item { font-size: 0.8rem; }
+        .detail-label { color: #71717a; }
+        .detail-value { color: #d4d4d8; font-weight: 500; }
+        .score-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 0.5rem; }
+        .score-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 2px; }
+        .score-text { font-size: 0.75rem; color: #a1a1aa; text-align: right; }
+        .audio-player { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .play-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; color: #60a5fa; font-size: 0.85rem; cursor: pointer; }
+        .play-btn:hover { background: rgba(59,130,246,0.3); }
+        .play-btn.playing { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171; }
+        .loading { text-align: center; padding: 3rem; color: #71717a; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        footer { text-align: center; padding: 2rem; color: #71717a; font-size: 0.85rem; }
+        footer a { color: #60a5fa; text-decoration: none; }
+        .method-info { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; color: #c4b5fd; }
+        .reset-btn { padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #a1a1aa; font-size: 0.85rem; cursor: pointer; }
+        .suggestion-panel { background: linear-gradient(145deg, rgba(100,116,139,0.15), rgba(100,116,139,0.05)); border: 1px solid rgba(148,163,184,0.3); border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem; }
+        .suggestion-title { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.5rem; }
+        .suggestion-disclaimer { font-size: 0.75rem; color: #94a3b8; margin-bottom: 1rem; font-style: italic; }
+        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.875rem; }
+        .suggestion-item { background: rgba(0,0,0,0.2); padding: 0.875rem; border-radius: 8px; }
+        .suggestion-label { font-size: 0.7rem; color: #94a3b8; margin-bottom: 0.25rem; text-transform: uppercase; }
+        .suggestion-value { font-size: 1rem; font-weight: 600; color: #e2e8f0; }
+        .suggestion-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; }
+        .suggestion-bar-fill { height: 100%; background: linear-gradient(90deg, #64748b, #94a3b8); border-radius: 2px; }
+        .upload-zone { border: 2px dashed rgba(251,146,60,0.4); border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; background: rgba(251,146,60,0.05); }
+        .upload-zone:hover { border-color: rgba(251,146,60,0.6); background: rgba(251,146,60,0.1); }
+        .upload-zone.dragover { border-color: #fb923c; background: rgba(251,146,60,0.15); }
+        .upload-icon { font-size: 2.5rem; margin-bottom: 1rem; color: #fb923c; }
+        .upload-text { color: #fb923c; font-weight: 500; margin-bottom: 0.5rem; }
+        .upload-hint { color: #71717a; font-size: 0.85rem; }
+        .upload-input { display: none; }
+        .extracted-features { background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); border-radius: 10px; padding: 1rem; margin-top: 1rem; }
+        .extracted-title { font-size: 0.85rem; color: #fb923c; margin-bottom: 0.75rem; font-weight: 500; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; }
+        .feature-item { background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; }
+        .feature-name { color: #fdba74; margin-bottom: 0.25rem; }
+        .processing-status { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: rgba(59,130,246,0.1); border-radius: 8px; margin-top: 1rem; }
+        .processing-spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #60a5fa; border-radius: 50%; animation: spin 1s linear infinite; }
+        .error-message { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 1rem; color: #fca5a5; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
+        const CATALOG_URL = DATA_BASE_URL + "catalog.json";
+        const MODEL_URL = DATA_BASE_URL + "model.json";
+        const AUDIO_BASE_URL = DATA_BASE_URL + "audio_tambores/";
+        
+        const WINDOW_SIZE = 2048, HOP_LENGTH = 1024, TAX = 0.001;
+        
+        const NORM_PARAMS = {
+            "RMS": { median: 0.07596126943826675, iqr: 0.16582938143983483 },
+            "Spectral Flatness": { median: 0.02321663685142994, iqr: 0.021487520076334476 },
+            "ZCR": { median: 0.2553476095199585, iqr: 0.13217097520828247 },
+            "Spectral Kurtosis": { median: 5523802.117365597, iqr: 15221542.31483832 },
+            "Spectral Entropy": { median: 10179.594596370978, iqr: 2855.520575066852 },
+            "Spectral Slope": { median: 4.513061266955422e-09, iqr: 2.6242933296319915e-09 },
+            "Inharmonicity": { median: 105394.11599057174, iqr: 66925.98083425332 },
+            "Effective Duration": { median: 1.0100680272108844, iqr: 0.6501587301587303 }
+        };
+        
+        const FEATURE_INFO = {
+            "RMS": { label: "Energy (RMS)", description: "Overall loudness and power of the sound. Higher values indicate a more powerful, projecting drum sound.", lowDesc: "Soft, delicate", highDesc: "Powerful, loud" },
+            "Spectral Flatness": { label: "Noisiness", description: "How noise-like vs tonal the sound is. Higher values indicate more percussive attack noise, lower values a cleaner tone.", lowDesc: "Clean, tonal", highDesc: "Noisy, textured" },
+            "ZCR": { label: "Brightness", description: "Presence of high-frequency content. Higher values produce a brighter, more cutting sound; lower values are darker and warmer.", lowDesc: "Dark, warm", highDesc: "Bright, cutting" },
+            "Spectral Kurtosis": { label: "Tonal Focus", description: "How concentrated the energy is around specific frequencies. Higher values indicate focused, resonant tones.", lowDesc: "Diffuse, spread", highDesc: "Focused, resonant" },
+            "Spectral Entropy": { label: "Complexity", description: "Richness and complexity of the harmonic content. Higher values indicate complex overtone structure.", lowDesc: "Simple, pure", highDesc: "Complex, rich" },
+            "Spectral Slope": { label: "Decay Character", description: "How quickly high frequencies decay relative to low frequencies. Affects the perceived warmth and body.", lowDesc: "Quick high decay", highDesc: "Sustained highs" },
+            "Inharmonicity": { label: "Pitch Clarity", description: "How clearly a fundamental pitch is perceived. Lower values give a clearer pitch sense.", lowDesc: "Clear pitch", highDesc: "Complex, bell-like" },
+            "Effective Duration": { label: "Sustain", description: "How long the sound rings out. Higher values indicate longer sustain and resonance.", lowDesc: "Tight, controlled", highDesc: "Long, resonant" }
+        };
+        
+        const P_LABELS = {
+            "wood_acoustic_velocity_m_s": { label: "Wood Type", getInterpretation: v => v < 135 ? "Denser wood (like Copaiba)" : v > 150 ? "Lighter wood (like Teca)" : "Medium density (like Araucaria)" },
+            "thick": { label: "Shell Thickness", getInterpretation: v => v > 7 ? "Thicker shell" : "Thinner shell" },
+            "reinf_ring": { label: "Reinforcement Ring", getInterpretation: v => v > 0.5 ? "With ring" : "Without ring" },
+            "hoop_material_density_kg_m3": { label: "Hoop Material", getInterpretation: v => v > 5000 ? "Steel hoop" : "Aluminum hoop" },
+            "batter_effective_total_mil": { label: "Drumhead Type", getInterpretation: v => v > 14.7 ? "Clear drumhead" : "Coated drumhead" }
+        };
+        
+        function getLevel(v) {
+            if (v <= -2) return { text: "Very Low", class: "very-low" };
+            if (v <= -0.5) return { text: "Low", class: "low" };
+            if (v <= 0.5) return { text: "Neutral", class: "neutral" };
+            if (v <= 2) return { text: "High", class: "high" };
+            return { text: "Very High", class: "very-high" };
+        }
+        
+        const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+        const matVec = (m, v) => m.map(r => dot(r, v));
+        const vecSub = (a, b) => a.map((v, i) => v - b[i]);
+        const norm2Sq = arr => arr.reduce((s, v) => s + v * v, 0);
+        const mahal = (x, mean, prec) => { const d = vecSub(x, mean); return Math.sqrt(Math.max(0, dot(d, matVec(prec, d)))); };
+        
+        function createHann(size) { const w = new Float32Array(size); for (let i = 0; i < size; i++) w[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (size - 1))); return w; }
+        
+        function windowSignal(sig, ws, hl) {
+            const nw = Math.floor(1 + (sig.length - ws) / hl), hann = createHann(ws), wins = [];
+            for (let i = 0; i < nw; i++) { const s = i * hl, w = new Float32Array(ws); for (let j = 0; j < ws; j++) w[j] = sig[s + j] * hann[j]; wins.push(w); }
+            return wins;
+        }
+        
+        function rfft(sig) {
+            const N = sig.length, nb = Math.floor(N / 2) + 1, mag = new Float32Array(nb);
+            for (let k = 0; k < nb; k++) { let re = 0, im = 0; for (let n = 0; n < N; n++) { const a = -2 * Math.PI * k * n / N; re += sig[n] * Math.cos(a); im += sig[n] * Math.sin(a); } mag[k] = Math.sqrt(re * re + im * im); }
+            return mag;
+        }
+        
+        function rfftFreq(ws, sr) { const nb = Math.floor(ws / 2) + 1, f = new Float32Array(nb); for (let i = 0; i < nb; i++) f[i] = i * sr / ws; return f; }
+        
+        const computeRMS = wins => norm2Sq(wins.map(w => Math.sqrt(w.reduce((s, v) => s + v * v, 0) / w.length)));
+        const computeSF = wins => norm2Sq(wins.map(w => { const m = rfft(w), gm = Math.exp(m.reduce((s, v) => s + Math.log(v + 1e-10), 0) / m.length), am = m.reduce((s, v) => s + v, 0) / m.length; return gm / (am + 1e-10); }));
+        const computeZCR = wins => norm2Sq(wins.map(w => { let c = 0; for (let i = 1; i < w.length; i++) if ((w[i] >= 0 && w[i-1] < 0) || (w[i] < 0 && w[i-1] >= 0)) c++; return c / (2 * w.length); }));
+        
+        function computeSC(mag, freqs) { const sm = mag.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let ws = 0; for (let i = 0; i < mag.length; i++) ws += freqs[i] * mag[i]; return ws / sm; }
+        function computeSS(mag, freqs, sc) { const sm = mag.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let ws = 0; for (let i = 0; i < mag.length; i++) { const d = freqs[i] - sc; ws += d * d * mag[i]; } return Math.sqrt(ws / sm); }
+        
+        function computeSK(wins, sr) {
+            const freqs = rfftFreq(wins[0].length, sr);
+            return norm2Sq(wins.map(w => { const m = rfft(w), sc = computeSC(m, freqs), ss = computeSS(m, freqs, sc); if (ss < 1e-10) return 0; const sm = m.reduce((s, v) => s + v, 0); let w4 = 0; for (let i = 0; i < m.length; i++) w4 += Math.pow(freqs[i] - sc, 4) * m[i]; return w4 / (Math.pow(ss, 4) * sm + 1e-10); }));
+        }
+        
+        const computeSE = wins => norm2Sq(wins.map(w => { const m = rfft(w), sm = m.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let e = 0; for (let i = 0; i < m.length; i++) { const p = m[i] / sm; if (p > 1e-10) e -= p * Math.log2(p); } return e; }));
+        
+        function computeSSl(wins) {
+            return norm2Sq(wins.map(w => { const m = rfft(w), M = m.length, sm = m.reduce((s, v) => s + v, 0); if (sm < 1e-10) return 0; let sn = 0, snm = 0, sn2 = 0; for (let n = 0; n < M; n++) { sn += n; snm += n * m[n]; sn2 += n * n; } const num = M * snm - sn * sm, den = M * sn2 - sn * sn; return Math.abs(den) < 1e-10 ? 0 : (1 / sm) * num / den; }));
+        }
+        
+        function computeF0(sig, sr) {
+            const N = sig.length, ac = new Float32Array(N), ma = Math.max(...sig.map(Math.abs)), norm = sig.map(v => v / (ma + 1e-10)), en = norm.reduce((s, v) => s + v * v, 0);
+            for (let l = 0; l < N; l++) { let s = 0; for (let i = 0; i < N - l; i++) s += norm[i] * norm[i + l]; ac[l] = s / en; }
+            const minL = Math.floor(sr / 500), maxL = Math.floor(sr / 50); let mv = 0, mi = 0;
+            for (let i = minL; i < Math.min(maxL, N); i++) if (ac[i] > mv && ac[i] > 0.01 && i > 0 && i < N - 1 && ac[i] > ac[i-1] && ac[i] > ac[i+1]) { mv = ac[i]; mi = i; }
+            return mi > 0 ? sr / mi : 100;
+        }
+        
+        function computeInh(wins, sr, f0) {
+            const freqs = rfftFreq(wins[0].length, sr);
+            return norm2Sq(wins.map(w => { const m = rfft(w), msq = m.map(v => v * v), smsq = msq.reduce((s, v) => s + v, 0); if (smsq < 1e-10 || f0 < 1e-10) return 0; let ws = 0; for (let h = 0; h < m.length; h++) ws += (freqs[h] - h * f0) * msq[h]; return (2 / f0) * ws / smsq; }));
+        }
+        
+        function computeED(sig, sr, ws, hl) {
+            const nw = Math.floor(1 + (sig.length - ws) / hl), en = [];
+            for (let i = 0; i < nw; i++) { const s = i * hl; let e = 0; for (let j = 0; j < ws && s + j < sig.length; j++) e += sig[s + j] * sig[s + j]; en.push(e); }
+            const me = Math.max(...en), th = me * TAX, mi = en.indexOf(me); let ei = sig.length;
+            for (let i = mi; i < en.length; i++) if (en[i] < th) { ei = i * hl; break; }
+            return ei / sr;
+        }
+        
+        function extractFeatures(data, sr) {
+            const wins = windowSignal(data, WINDOW_SIZE, HOP_LENGTH), f0 = computeF0(data, sr);
+            const raw = { "RMS": computeRMS(wins), "Spectral Flatness": computeSF(wins), "ZCR": computeZCR(wins), "Spectral Kurtosis": computeSK(wins, sr), "Spectral Entropy": computeSE(wins), "Spectral Slope": computeSSl(wins), "Inharmonicity": computeInh(wins, sr, f0), "Effective Duration": computeED(data, sr, WINDOW_SIZE, HOP_LENGTH) };
+            const norm = {}; for (const [k, v] of Object.entries(raw)) { const { median, iqr } = NORM_PARAMS[k]; norm[k] = iqr !== 0 ? (v - median) / iqr : (v - median); }
+            return { raw, normalized: norm, f0 };
+        }
+        
+        function computeResidual(aVec, zVec, model) {
+            const zStd = zVec.map((z, i) => (z - model.resid_params.z_mean[i]) / model.resid_params.z_std[i]);
+            const aPred = model.resid_params.intercept.map((int, i) => int + dot(zStd, model.resid_params.coef[i]));
+            return vecSub(aVec, aPred);
+        }
+        
+        function predictPhysical(aResid, model) {
+            const inv = model.inverse_model;
+            const pStd = inv.coef.map((row, i) => inv.intercept[i] + dot(aResid, row));
+            const pPred = pStd.map((v, i) => v * inv.p_std[i] + inv.p_mean[i]);
+            return { standardized: pStd, original: pPred, columns: inv.p_columns };
+        }
+        
+        function rankConfigs(queryA, queryZ, catalog, model) {
+            const A_COLS = model.a_stats.columns, Z_COLS = model.resid_params.z_columns;
+            const qResid = computeResidual(queryA, queryZ, model);
+            const groups = {}; catalog.forEach(item => { if (!groups[item.config_id]) groups[item.config_id] = []; groups[item.config_id].push(item); });
+            const scores = Object.entries(groups).map(([cid, samples]) => {
+                const dists = samples.map(s => { const sA = A_COLS.map(c => s[c]), sZ = Z_COLS.map(c => s[c]), sR = computeResidual(sA, sZ, model); return mahal(qResid, sR, model.mahal_params.precision); });
+                const minD = Math.min(...dists); return { config_id: parseInt(cid), distance: minD, sample: samples[dists.indexOf(minD)] };
+            });
+            scores.sort((a, b) => a.distance - b.distance); return scores;
+        }
+        
+        const { useState, useEffect, useRef } = React;
+        
+        function App() {
+            const [catalog, setCatalog] = useState(null);
+            const [model, setModel] = useState(null);
+            const [loadingData, setLoadingData] = useState(true);
+            const [loadError, setLoadError] = useState(null);
+            const [activeTab, setActiveTab] = useState('upload');
+            const [sliderValues, setSliderValues] = useState({});
+            const [results, setResults] = useState([]);
+            const [predictions, setPredictions] = useState(null);
+            const [playingAudio, setPlayingAudio] = useState(null);
+            const [uploadedFeatures, setUploadedFeatures] = useState(null);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
+            const audioRef = useRef(null);
+            
+            useEffect(() => {
+                async function loadData() {
+                    try {
+                        const [catRes, modRes] = await Promise.all([fetch(CATALOG_URL), fetch(MODEL_URL)]);
+                        if (!catRes.ok || !modRes.ok) throw new Error('Failed to load data');
+                        const catData = await catRes.json(), modData = await modRes.json();
+                        setCatalog(catData); setModel(modData);
+                        const init = {}; modData.a_stats.columns.forEach(c => { init[c] = 0; }); setSliderValues(init);
+                        setLoadingData(false);
+                    } catch (e) { setLoadError(e.message); setLoadingData(false); }
+                }
+                loadData();
+            }, []);
+            
+            useEffect(() => {
+                if (!catalog || !model) return;
+                const A_COLS = model.a_stats.columns;
+                if (activeTab === 'upload' && uploadedFeatures) {
+                    const qA = A_COLS.map(c => uploadedFeatures.normalized[c]), qZ = [70, 70], qR = computeResidual(qA, qZ, model);
+                    setPredictions(predictPhysical(qR, model)); setResults(rankConfigs(qA, qZ, catalog, model));
+                } else if (activeTab === 'design') {
+                    const qA = A_COLS.map(c => sliderValues[c]), qZ = [70, 70], qR = computeResidual(qA, qZ, model);
+                    setPredictions(predictPhysical(qR, model)); setResults(rankConfigs(qA, qZ, catalog, model));
+                } else { setPredictions(null); setResults([]); }
+            }, [activeTab, sliderValues, uploadedFeatures, catalog, model]);
+            
+            const handleFileUpload = async (file) => {
+                setIsProcessing(true); setUploadedFeatures(null); setPredictions(null); setResults([]);
+                try {
+                    const ab = await file.arrayBuffer(), ac = new (window.AudioContext || window.webkitAudioContext)(), buf = await ac.decodeAudioData(ab);
+                    setUploadedAudioUrl(URL.createObjectURL(file));
+                    setUploadedFeatures(extractFeatures(Array.from(buf.getChannelData(0)), buf.sampleRate));
+                } catch (e) { alert('Error processing audio file.'); }
+                setIsProcessing(false);
+            };
+            
+            const playAudio = (fn) => {
+                if (playingAudio === fn) { audioRef.current?.pause(); setPlayingAudio(null); }
+                else { audioRef.current.src = fn.startsWith('blob:') ? fn : AUDIO_BASE_URL + fn; audioRef.current.play(); setPlayingAudio(fn); }
+            };
+            
+            if (loadingData) return <div className="container"><header><h1>Drum Timbre Recommender</h1></header><div className="loading"><div className="spinner"></div><p>Loading data...</p></div></div>;
+            if (loadError) return <div className="container"><header><h1>Drum Timbre Recommender</h1></header><div className="error-message">Error: {loadError}</div></div>;
+            
+            const A_COLS = model.a_stats.columns;
+            const P_COLS_DISPLAY = model.inverse_model.p_columns.filter(c => c !== 'wood_acoustic_impedance_rayl');
+            
+            return (
+                <div className="container">
+                    <header><h1>Drum Timbre Recommender</h1><p className="subtitle">Interactive demonstration of the TwoStage Hybrid retrieval model</p></header>
+                    <div className="tabs">
+                        <button className={`tab ${activeTab === 'upload' ? 'active' : ''}`} onClick={() => setActiveTab('upload')}>Upload Audio</button>
+                        <button className={`tab ${activeTab === 'design' ? 'active' : ''}`} onClick={() => setActiveTab('design')}>Design Timbre</button>
+                    </div>
+                    
+                    {activeTab === 'upload' && <UploadPanel onFileUpload={handleFileUpload} isProcessing={isProcessing} uploadedFeatures={uploadedFeatures} uploadedAudioUrl={uploadedAudioUrl} playAudio={playAudio} playingAudio={playingAudio} A_COLS={A_COLS} />}
+                    
+                    {activeTab === 'design' && (
+                        <div className="panel">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <div className="panel-title" style={{ marginBottom: 0 }}>Define Your Desired Timbre</div>
+                                <button className="reset-btn" onClick={() => { const r = {}; A_COLS.forEach(c => { r[c] = 0; }); setSliderValues(r); }}>Reset All</button>
+                            </div>
+                            <div className="sliders-grid">
+                                {A_COLS.map(col => { const info = FEATURE_INFO[col], lv = getLevel(sliderValues[col]); return (
+                                    <div key={col} className="slider-item">
+                                        <div className="slider-header"><div><div className="slider-label">{info.label}</div></div><span className={`slider-level ${lv.class}`}>{lv.text}</span></div>
+                                        <div className="slider-description">{info.description}</div>
+                                        <input type="range" min="-3" max="3" step="0.1" value={sliderValues[col]} onChange={e => setSliderValues(p => ({ ...p, [col]: parseFloat(e.target.value) }))} />
+                                        <div className="slider-scale"><span>{info.lowDesc}</span><span>{info.highDesc}</span></div>
+                                    </div>
+                                ); })}
+                            </div>
+                            <div className="method-info">Adjust the sliders to describe your ideal drum sound. The system will find the closest matching configurations from our database of 144 recordings across 9 different drum setups.</div>
+                        </div>
+                    )}
+                    
+                    {predictions && <SuggestionPanel predictions={predictions} P_COLS_DISPLAY={P_COLS_DISPLAY} />}
+                    
+                    {results.length > 0 && (
+                        <div className="panel">
+                            <div className="panel-title">Closest Matching Configurations</div>
+                            <div className="results-grid">
+                                {results.slice(0, 3).map((r, i) => <ResultCard key={r.config_id} result={r} rank={i + 1} maxDistance={results[results.length - 1].distance} playAudio={playAudio} playingAudio={playingAudio} />)}
+                            </div>
+                        </div>
+                    )}
+                    
+                    <audio ref={audioRef} onEnded={() => setPlayingAudio(null)} />
+                    <footer><p>PhD Thesis Demo — Carlos Eduardo Leal de Castro<br/><a href="https://www.ime.usp.br/~carlos.castro/phd" target="_blank">Timbre discrimination in drum tom-toms</a> | IME-USP, 2024</p></footer>
+                </div>
+            );
+        }
+        
+        function UploadPanel({ onFileUpload, isProcessing, uploadedFeatures, uploadedAudioUrl, playAudio, playingAudio, A_COLS }) {
+            const [isDragOver, setIsDragOver] = useState(false);
+            const fileInputRef = useRef(null);
+            return (
+                <div className="panel">
+                    <div className="panel-title">Upload Your Drum Recording</div>
+                    <div className={`upload-zone ${isDragOver ? 'dragover' : ''}`}
+                        onDrop={e => { e.preventDefault(); setIsDragOver(false); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('audio/')) onFileUpload(f); }}
+                        onDragOver={e => { e.preventDefault(); setIsDragOver(true); }}
+                        onDragLeave={() => setIsDragOver(false)}
+                        onClick={() => fileInputRef.current?.click()}>
+                        <div className="upload-icon">&#9835;</div>
+                        <div className="upload-text">Drop your audio file here or click to browse</div>
+                        <div className="upload-hint">Supports WAV, MP3, OGG, and other audio formats</div>
+                        <input ref={fileInputRef} type="file" accept="audio/*" className="upload-input" onChange={e => { const f = e.target.files[0]; if (f) onFileUpload(f); }} />
+                    </div>
+                    {isProcessing && <div className="processing-status"><div className="processing-spinner"></div><span>Extracting audio features...</span></div>}
+                    {uploadedFeatures && (
+                        <div className="extracted-features">
+                            <div className="extracted-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span>Extracted Features</span>
+                                {uploadedAudioUrl && <button className={`play-btn ${playingAudio === uploadedAudioUrl ? 'playing' : ''}`} onClick={() => playAudio(uploadedAudioUrl)}>{playingAudio === uploadedAudioUrl ? 'Stop' : 'Play'}</button>}
+                            </div>
+                            <div className="features-grid">
+                                {A_COLS.map(col => { const info = FEATURE_INFO[col], lv = getLevel(uploadedFeatures.normalized[col]); return (
+                                    <div key={col} className="feature-item"><div className="feature-name">{info.label}</div><span className={`slider-level ${lv.class}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem' }}>{lv.text}</span></div>
+                                ); })}
+                            </div>
+                            <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#71717a' }}>Detected f0: {uploadedFeatures.f0.toFixed(1)} Hz</div>
+                        </div>
+                    )}
+                    <div className="method-info">Upload a recording of a drum hit. The system will extract acoustic features and find similar configurations in our database of 144 tom-tom recordings.</div>
+                </div>
+            );
+        }
+        
+        function SuggestionPanel({ predictions, P_COLS_DISPLAY }) {
+            const { original, standardized, columns } = predictions;
+            const getBar = v => Math.max(0, Math.min(100, ((v + 3) / 6) * 100));
+            return (
+                <div className="suggestion-panel">
+                    <div className="suggestion-title">Design Hints</div>
+                    <div className="suggestion-disclaimer">Indicative suggestions based on correlations observed in a limited dataset (9 configurations). Use as general guidance, not as precise specifications.</div>
+                    <div className="suggestion-grid">
+                        {P_COLS_DISPLAY.map(col => { const ci = columns.indexOf(col); if (ci === -1) return null; const info = P_LABELS[col]; return (
+                            <div key={col} className="suggestion-item">
+                                <div className="suggestion-label">{info.label}</div>
+                                <div className="suggestion-value">{info.getInterpretation(original[ci])}</div>
+                                <div className="suggestion-bar"><div className="suggestion-bar-fill" style={{ width: `${getBar(standardized[ci])}%` }} /></div>
+                            </div>
+                        ); })}
+                    </div>
+                </div>
+            );
+        }
+        
+        function ResultCard({ result, rank, maxDistance, playAudio, playingAudio }) {
+            const s = result.sample, score = Math.max(0, Math.min(100, (1 - result.distance / (maxDistance * 1.2)) * 100));
+            return (
+                <div className={`result-card rank-${rank}`}>
+                    <div className="rank-badge">{rank}</div>
+                    <div className="config-name">{s.wood.charAt(0).toUpperCase() + s.wood.slice(1)} Drum</div>
+                    <div className="config-details">
+                        <div className="detail-item"><span className="detail-label">Wood: </span><span className="detail-value">{s.wood}</span></div>
+                        <div className="detail-item"><span className="detail-label">Thickness: </span><span className="detail-value">{s.thick}mm</span></div>
+                        <div className="detail-item"><span className="detail-label">Ring: </span><span className="detail-value">{s.reinf_ring ? 'Yes' : 'No'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Hoop: </span><span className="detail-value">{s.hoop}</span></div>
+                        <div className="detail-item"><span className="detail-label">Drumhead: </span><span className="detail-value">{s.drumhead}</span></div>
+                        <div className="detail-item"><span className="detail-label">f0: </span><span className="detail-value">{s.f0.toFixed(1)} Hz</span></div>
+                    </div>
+                    <div className="score-bar"><div className="score-fill" style={{ width: `${score}%` }}></div></div>
+                    <div className="score-text">Similarity distance: {result.distance.toFixed(3)}</div>
+                    <div className="audio-player"><button className={`play-btn ${playingAudio === s.name_file ? 'playing' : ''}`} onClick={() => playAudio(s.name_file)}>{playingAudio === s.name_file ? 'Stop' : 'Play Sample'}</button></div>
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
