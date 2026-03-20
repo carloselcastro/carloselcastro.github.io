@@ -193,6 +193,7 @@
 .rec .radar-legend { display: flex; gap: 1.25rem; font-size: 0.72rem; color: var(--rec-muted); margin-top: 0.5rem; }
 .rec .radar-legend span { display: flex; align-items: center; gap: 0.35rem; }
 .rec .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.rec .radar-hint { font-size: 0.68rem; color: var(--rec-muted-2); text-align: center; margin-top: 0.4rem; font-style: italic; }
 
 /* Buttons */
 .rec .play-btn,
@@ -301,6 +302,34 @@
 .rec footer { text-align: left; padding: 1.25rem 0 0; color: var(--rec-muted); font-size: 0.9rem; }
 .rec footer a { color: var(--rec-accent); text-decoration: none; }
 .rec footer a:hover { text-decoration: underline; }
+
+/* Sound profile tags */
+.rec .sound-profile-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rec-muted-2);
+  margin-top: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+.rec .sound-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.rec .sound-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+}
+.rec .sound-tag.hi {
+  color: var(--rec-accent);
+  background: var(--rec-accent-soft);
+  border: 1px solid rgba(142,68,173,0.22);
+}
+.rec .sound-tag.lo {
+  color: #0369a1;
+  background: rgba(3,105,161,0.09);
+  border: 1px solid rgba(3,105,161,0.20);
+}
 
     </style>
   </head>
@@ -556,6 +585,30 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
             });
             scores.sort((a, b) => a.distance - b.distance);
             return scores;
+        }
+
+        const SOUND_DESCRIPTORS = {
+            "RMS":               { hi: "Powerful",    lo: "Delicate"    },
+            "Spectral Flatness": { hi: "Textured",    lo: "Clean"       },
+            "ZCR":               { hi: "Bright",      lo: "Dark & Warm" },
+            "Spectral Kurtosis": { hi: "Focused",     lo: "Spread"      },
+            "Spectral Entropy":  { hi: "Complex",     lo: "Pure"        },
+            "Spectral Slope":    { hi: "Open highs",  lo: "Fast decay"  },
+            "Inharmonicity":     { hi: "Bell-like",   lo: "Clear pitch" },
+            "Effective Duration":{ hi: "Resonant",    lo: "Tight & Dry" }
+        };
+
+        function getSoundTags(sample, cols) {
+            return cols
+                .map(col => ({ col, val: parseFloat(sample[col]) || 0 }))
+                .filter(({ val }) => Math.abs(val) > 0.6)
+                .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))
+                .slice(0, 5)
+                .map(({ col, val }) => {
+                    const d = SOUND_DESCRIPTORS[col];
+                    return d ? { text: val > 0 ? d.hi : d.lo, hi: val > 0 } : null;
+                })
+                .filter(Boolean);
         }
 
         function RadarChart({ queryFeatures, sampleFeatures, cols }) {
@@ -867,6 +920,7 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
 
         function ResultCard({ result, rank, playAudio, playingAudio, queryFeatures, A_COLS }) {
             const s = result.sample;
+            const soundTags = A_COLS ? getSoundTags(s, A_COLS) : [];
 
             return (
                 <div className={`result-card rank-${rank}`}>
@@ -886,6 +940,17 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
                             <div className="radar-legend">
                                 <span><span className="legend-dot" style={{background:'rgba(142,68,173,0.90)'}}></span>Your selection</span>
                                 <span><span className="legend-dot" style={{background:'rgba(100,116,139,0.70)'}}></span>Drum features</span>
+                            </div>
+                            <div className="radar-hint">Each axis is a timbral feature. Further from the center = higher intensity. Overlapping shapes = closer match.</div>
+                        </div>
+                    )}
+                    {soundTags.length > 0 && (
+                        <div>
+                            <div className="sound-profile-label">Sound Profile</div>
+                            <div className="sound-tags">
+                                {soundTags.map((t, i) => (
+                                    <span key={i} className={`sound-tag ${t.hi ? 'hi' : 'lo'}`}>{t.text}</span>
+                                ))}
                             </div>
                         </div>
                     )}
