@@ -66,7 +66,7 @@
   transition: background-color .15s ease, color .15s ease, transform .15s ease;
 }
 .rec .tab:hover { background: var(--rec-accent-soft); color: var(--rec-text); }
-.rec .tab.active { background: var(--rec-accent); color: #fff; }
+.rec .tab.active { background: var(--rec-accent); color: #fff !important; }
 
 /* Panels */
 .rec .panel {
@@ -188,9 +188,11 @@
 .rec .detail-label { color: var(--rec-muted); }
 .rec .detail-value { color: var(--rec-text); font-weight: 700; }
 
-.rec .score-bar { height: 6px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; margin-bottom: 0.5rem; }
-.rec .score-fill { height: 100%; background: var(--rec-accent); border-radius: 999px; }
-.rec .score-text { font-size: 0.75rem; color: var(--rec-muted); text-align: right; }
+/* Radar chart */
+.rec .radar-wrap { margin: 1rem 0 0.25rem; display: flex; flex-direction: column; align-items: center; }
+.rec .radar-legend { display: flex; gap: 1.25rem; font-size: 0.72rem; color: var(--rec-muted); margin-top: 0.5rem; }
+.rec .radar-legend span { display: flex; align-items: center; gap: 0.35rem; }
+.rec .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
 /* Buttons */
 .rec .play-btn,
@@ -276,6 +278,24 @@
 .rec .processing-spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.12); border-top-color: var(--rec-accent); border-radius: 50%; animation: rec-spin 1s linear infinite; }
 
 .rec .error-message { background: rgba(185, 28, 28, 0.08); border: 1px solid rgba(185, 28, 28, 0.22); border-radius: 0.6rem; padding: 1rem; color: rgba(120, 0, 0, 0.85); text-align: center; }
+
+/* Odery credit */
+.rec .odery-credit {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--rec-muted);
+  flex-wrap: wrap;
+}
+.rec .odery-logo {
+  height: 32px;
+  width: auto;
+  vertical-align: middle;
+  transition: opacity 0.15s ease;
+}
+.rec .odery-logo:hover { opacity: 0.75; }
 
 /* Footer inside the app */
 .rec footer { text-align: left; padding: 1.25rem 0 0; color: var(--rec-muted); font-size: 0.9rem; }
@@ -538,6 +558,46 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
             return scores;
         }
 
+        function RadarChart({ queryFeatures, sampleFeatures, cols }) {
+            const size = 250, cx = size / 2, cy = size / 2, R = size * 0.30;
+            const n = cols.length;
+            const norm = v => { const n = isNaN(parseFloat(v)) ? 0 : parseFloat(v); return Math.max(0, Math.min(1, (n + 3) / 6)); };
+            const angle = i => (i / n) * 2 * Math.PI - Math.PI / 2;
+            const pt = (i, v) => { const r = norm(v) * R, a = angle(i); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+            const toPath = pts => pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ') + ' Z';
+
+            const rings = [0.25, 0.5, 0.75, 1.0];
+            const axes = cols.map((col, i) => {
+                const a = angle(i);
+                return { x2: cx + R * Math.cos(a), y2: cy + R * Math.sin(a),
+                         lx: cx + (R + 22) * Math.cos(a), ly: cy + (R + 22) * Math.sin(a),
+                         label: (FEATURE_INFO[col]?.label || col) };
+            });
+            const qPts = cols.map((col, i) => pt(i, queryFeatures[col] || 0));
+            const sPts = cols.map((col, i) => pt(i, sampleFeatures[col] || 0));
+
+            return (
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{overflow:'visible'}}>
+                    {rings.map((r, ri) => (
+                        <polygon key={ri}
+                            points={cols.map((_, i) => { const a = angle(i); return `${(cx+r*R*Math.cos(a)).toFixed(1)},${(cy+r*R*Math.sin(a)).toFixed(1)}`; }).join(' ')}
+                            fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="1" />
+                    ))}
+                    {axes.map((ax, i) => (
+                        <line key={i} x1={cx} y1={cy} x2={ax.x2} y2={ax.y2} stroke="rgba(0,0,0,0.10)" strokeWidth="1" />
+                    ))}
+                    <path d={toPath(sPts)} fill="rgba(100,116,139,0.18)" stroke="rgba(100,116,139,0.70)" strokeWidth="1.5" strokeLinejoin="round" />
+                    <path d={toPath(qPts)} fill="rgba(142,68,173,0.18)" stroke="rgba(142,68,173,0.90)" strokeWidth="2" strokeLinejoin="round" />
+                    {axes.map((ax, i) => (
+                        <text key={i} x={ax.lx} y={ax.ly} textAnchor="middle" dominantBaseline="middle"
+                            fontSize="7.5" fill="rgba(0,0,0,0.55)" fontWeight="700" fontFamily="inherit">
+                            {ax.label}
+                        </text>
+                    ))}
+                </svg>
+            );
+        }
+
         const { useState, useEffect, useRef } = React;
 
         function App() {
@@ -649,12 +709,21 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
             }
 
             const A_COLS = model.a_stats.columns;
+            const queryNormFeatures = (activeTab === 'upload' && uploadedFeatures)
+                ? uploadedFeatures.normalized
+                : sliderValues;
 
             return (
                 <div className="container">
                     <header>
                         <h1>Drum Timbre Recommender</h1>
                         <p className="subtitle">Find drum configurations matching your desired timbre characteristics</p>
+                        <div className="odery-credit">
+                            <span>All drums in this research are manufactured by</span>
+                            <a href="https://www.odery.com" target="_blank" rel="noopener noreferrer">
+                                <img src="images/phd/Odery_Drums_removebg.png" alt="Odery Drums" className="odery-logo" />
+                            </a>
+                        </div>
                     </header>
 
                     <div className="tabs">
@@ -712,9 +781,10 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
                                         key={r.config_id}
                                         result={r}
                                         rank={i + 1}
-                                        maxDistance={results[results.length - 1].distance}
                                         playAudio={playAudio}
                                         playingAudio={playingAudio}
+                                        queryFeatures={queryNormFeatures}
+                                        A_COLS={A_COLS}
                                     />
                                 ))}
                             </div>
@@ -795,9 +865,8 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
             );
         }
 
-        function ResultCard({ result, rank, maxDistance, playAudio, playingAudio }) {
+        function ResultCard({ result, rank, playAudio, playingAudio, queryFeatures, A_COLS }) {
             const s = result.sample;
-            const score = Math.max(0, Math.min(100, (1 - result.distance / (maxDistance * 1.2)) * 100));
 
             return (
                 <div className={`result-card rank-${rank}`}>
@@ -811,8 +880,15 @@ const DATA_BASE_URL = "https://carloselcastro.github.io/audios/";
                         <div className="detail-item"><span className="detail-label">Drumhead: </span><span className="detail-value">{s.drumhead}</span></div>
                         <div className="detail-item"><span className="detail-label">f0: </span><span className="detail-value">{s.f0.toFixed(1)} Hz</span></div>
                     </div>
-                    <div className="score-bar"><div className="score-fill" style={{ width: `${score}%` }}></div></div>
-                    <div className="score-text">Similarity distance: {result.distance.toFixed(3)}</div>
+                    {queryFeatures && A_COLS && (
+                        <div className="radar-wrap">
+                            <RadarChart queryFeatures={queryFeatures} sampleFeatures={s} cols={A_COLS} />
+                            <div className="radar-legend">
+                                <span><span className="legend-dot" style={{background:'rgba(142,68,173,0.90)'}}></span>Your selection</span>
+                                <span><span className="legend-dot" style={{background:'rgba(100,116,139,0.70)'}}></span>Drum features</span>
+                            </div>
+                        </div>
+                    )}
                     <div className="audio-player">
                         <button
                             className={`play-btn ${playingAudio === s.name_file ? 'playing' : ''}`}
