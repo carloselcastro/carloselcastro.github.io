@@ -5,6 +5,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/odete-project.css" />
 		<link rel="icon" href="images/cabecacarlos.png" width="10">
 		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -25,10 +26,19 @@
 			    			<li><a href="https://orcid.org/0000-0003-0201-0926" target="_blank"> <img border="0" src="images/orcid.png" width="25"></a></li>
 						</ul>
 					</header>
-						<section id="odete">
-                            <h3>ODETE.SYS — Robot Voice Lab</h3>
-                            <p>A playful formant synthesizer with a retro interface. Make Odete speak, compose a singing melody, import MIDI files, and export the result as audio. Sound is generated locally in your browser.</p>
-                            <ul class="actions"><li><a href="odete/" class="button primary">Play with Odete</a></li></ul>
+						<section id="odete" aria-labelledby="odete-project-title">
+                            <h3 id="odete-project-title">ODETE.SYS — Formant Voice &amp; Singing Lab</h3>
+                            <p>Odete is a playful electronic mouth: a retro laboratory that turns text and musical notes into a synthetic voice. Its sound is built with <strong>formant synthesis</strong>, inspired by the early days of computer speech and singing.</p>
+                            <h4>From a buzz to a voice</h4>
+                            <p>The engine follows a <strong>source–filter model</strong>. A train of synthetic glottal pulses provides the voiced excitation, while noise contributes breath and friction to consonants. The pulse repetition rate sets the fundamental frequency, <strong>F0</strong>: the pitch you hear. The signal then passes through three resonant filters that approximate the vocal tract. Their resonances, called <strong>formants (F1, F2 and F3)</strong>, shape the vowel. Change the formants while keeping F0 fixed, and the same note can sound like “ah”, “ee” or “oo”.</p>
+                            <div class="odete-signal-path" aria-label="Signal path: glottal pulses and noise, then formant filters, then synthetic voice"><span>PULSES + NOISE</span><b aria-hidden="true">→</b><span>F1 · F2 · F3</span><b aria-hidden="true">→</b><span>VOICE</span></div>
+                            <h4>Making the mouth sing</h4>
+                            <p>Text is mapped to a sequence of speech sounds. In singing mode, each syllable is paired with a note and a duration: the note sets F0, and the tempo turns beats into seconds. Consonants stay short while vowels carry the sustained notes. Smooth transitions between sounds help join the phrase. You can edit syllables, pronunciation, notes and rhythm, import a monophonic MIDI melody, and export the result as WAV audio or MIDI note data.</p>
+                            <p class="odete-project-note">Synthesis runs locally in your browser. The phonetic rules are deliberately simple, so pronunciation remains experimental. Explore the source–filter idea in the <a href="https://www.fon.hum.uva.nl/praat/manual/Source-filter_synthesis.html">Praat documentation</a>.</p>
+                            <a class="odete-launch" href="odete/" aria-label="Open ODETE.SYS voice and singing laboratory">
+                                <img src="odete/wordmark.svg" alt="ODETE.SYS" width="720" height="163" loading="lazy" />
+                                <span class="odete-launch-caption">OPEN THE VOICE LAB <span aria-hidden="true">↗</span></span>
+                            </a>
                         </section>
 						<section>
 							<h3>Multi-Timbre Synthesizer</h3>
