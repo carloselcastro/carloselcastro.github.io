@@ -69,6 +69,15 @@ section{padding:64px 0;border-top:1px solid var(--rule)}
 .team{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 48px}
 .person{display:grid;grid-template-columns:104px minmax(0,1fr);gap:20px;align-items:start}
 .person img{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;filter:grayscale(.15)}
+.student{display:grid;grid-template-columns:104px minmax(0,1fr);gap:20px;align-items:start;max-width:860px}
+.student img{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;filter:grayscale(.15)}
+.student .kind{color:var(--mute);font-size:.9rem;margin-bottom:.4rem}
+.student h4{font-family:"Public Sans",sans-serif;font-weight:600;font-size:1.02rem;color:var(--ink);margin:.2rem 0 .5rem;line-height:1.4}
+.student details{margin-top:.25rem}
+.student summary{cursor:pointer;color:var(--link);font-size:.95rem}
+.student details p{font-size:.96rem;margin-top:.75rem}
+.student .lattes{font-size:.92rem;margin:-.25rem 0 .25rem}
+.student .kw{color:var(--mute);font-size:.92rem}
 .team .role{color:var(--mute);font-size:.9rem;margin-bottom:.4rem}
 .team .lattes{font-size:.92rem;margin-top:-.25rem}
 .team p{font-size:.98rem}
@@ -109,6 +118,8 @@ footer p{max-width:none}
   .lines{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:560px){
+  .student{grid-template-columns:72px minmax(0,1fr);gap:16px}
+  .student img{width:72px;height:72px}
   .person{grid-template-columns:72px minmax(0,1fr);gap:16px}
   .person img{width:72px;height:72px}
   .wrap{padding:0 16px}
@@ -220,6 +231,26 @@ footer p{max-width:none}
           <p>Doutor em Ciências e mestre em Engenharia Elétrica (Poli-USP), com pós-doutorado na Poli-USP. Internet das Coisas, redes cognitivas, cidades inteligentes e cibersegurança.</p>
           <p class="lattes"><a href="http://lattes.cnpq.br/9782031388762785">Currículo Lattes</a></p>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="alunos">
+  <div class="wrap">
+    <h2 id="alunos">Alunos e ex-alunos</h2>
+    <div class="student">
+      <img src="img/paulo-cordeiro.jpg" alt="Foto de Paulo Octávio Cordeiro" width="400" height="400" loading="lazy" />
+      <div>
+        <h3>Paulo Octávio Cordeiro</h3>
+        <p class="kind">Iniciação científica, Ciência de Dados e Inteligência Artificial. Orientador: Carlos Eduardo Leal de Castro</p>
+        <h4>Precificação de opções americanas: PSOR vs LSM</h4>
+        <p class="lattes"><a href="https://www.linkedin.com/in/paulo-cordeiro-255313315/">LinkedIn</a></p>
+        <details>
+          <summary>Resumo</summary>
+          <p>A precificação de opções americanas de venda constitui um problema sem solução analítica fechada, em razão do direito de exercício antecipado, o que exige o emprego de métodos numéricos. Este trabalho compara dois métodos de naturezas distintas: o PSOR (Projected Successive Over-Relaxation), que resolve o problema de complementaridade linear derivado da equação de Black-Scholes por diferenças finitas com esquema de Crank-Nicolson, e o LSM (Least Squares Monte Carlo), que estima o valor de continuação da opção por simulação estocástica de trajetórias e regressão por mínimos quadrados. Adotou-se o modelo binomial de Cox-Ross-Rubinstein (CRR) como referência determinística de alta precisão e conduziu-se uma análise de convergência para calibrar os parâmetros de cada método — a resolução da malha no PSOR e o número de trajetórias e passos temporais no LSM —, assegurando comparação sob nível de erro equivalente. Os métodos foram aplicados a uma base real de opções da NVIDIA, no período de 2020 a 2022, com tratamento que incluiu a substituição da volatilidade implícita pela volatilidade histórica realizada. A estrutura do desvio entre preços teóricos e de mercado foi investigada por regressão linear, distinguindo o erro atribuível ao modelo daquele decorrente das condições de mercado. Por fim, os métodos foram comparados quanto à convergência, à precisão, à escalabilidade e ao comportamento frente à dimensionalidade, caracterizando os regimes em que cada abordagem é mais adequada. Conclui-se que nenhum método é universalmente superior e que o desvio frente ao mercado decorre da hipótese de volatilidade constante.</p>
+          <p class="kw">Palavras-chave: opções americanas; métodos numéricos; Black-Scholes; regressão por mínimos quadrados.</p>
+        </details>
       </div>
     </div>
   </div>
