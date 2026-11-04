@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SIGMA Lab | Ibmec São Paulo</title>
+<meta name="description" content="SIGMA Lab: grupo de pesquisa do Ibmec São Paulo em sistemas inteligentes, IoT, geometria, modelagem e algoritmos. Iniciação científica, TCC e publicações para alunos de graduação." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="SIGMA Lab | Ibmec São Paulo" />
+<meta property="og:description" content="Grupo de pesquisa do Ibmec São Paulo em sistemas inteligentes, IoT, geometria, modelagem e algoritmos." />
+<meta property="og:url" content="https://carloselcastro.github.io/sigma/" />
+<meta property="og:image" content="https://carloselcastro.github.io/sigma/sigma_lab_vetorizado_fund.png" />
+<link rel="canonical" href="https://carloselcastro.github.io/sigma/" />
+<link rel="icon" href="sigma_lab_vetorizado.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#101923;      /* tinta do logo */
+  --ink-2:#34414e;    /* texto corrido */
+  --mute:#66727e;     /* notas, metadados */
+  --wash:#e9edf1;     /* lavagem de tinta: fundos de bloco */
+  --rule:#cdd4db;
+  --paper:#fbfcfd;
+  --link:#1d4a6e;
+  --measure:68ch;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink-2);font:400 1.0625rem/1.65 "Public Sans",system-ui,sans-serif}
+a{color:var(--link);text-underline-offset:.18em}
+a:hover{color:var(--ink)}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px}
+h1,h2,h3{font-family:"Marcellus",Georgia,serif;font-weight:400;color:var(--ink);line-height:1.2;margin:0}
+h2{font-size:clamp(1.6rem,1.2rem + 1.4vw,2.2rem);margin-bottom:1.25rem}
+h3{font-size:1.25rem;margin-bottom:.35rem}
+p{margin:0 0 1rem;max-width:var(--measure)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* barra superior */
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-size:.95rem}
+.top a{text-decoration:none;color:var(--mute)}
+.top a:hover{color:var(--ink)}
+
+/* abertura: o sigma em pincelada é o elemento principal */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center;padding:24px 0 72px}
+.hero img{width:100%;max-width:440px;height:auto;display:block}
+.hero h1{font-size:clamp(2rem,1.4rem + 2.4vw,3.1rem);margin-bottom:1.25rem}
+.hero .lead{font-size:1.2rem;line-height:1.6;color:var(--ink-2)}
+.cta{display:inline-block;margin-top:.75rem;padding:.8rem 1.4rem;background:var(--ink);color:#fff;text-decoration:none;border-radius:3px;font-weight:600}
+.cta:hover{background:#26384a;color:#fff}
+.hero .where{color:var(--mute);font-size:.95rem;margin-top:1.25rem}
+
+section{padding:64px 0;border-top:1px solid var(--rule)}
+
+/* o nome: as letras são de fato a estrutura do conteúdo */
+.letters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border-top:1px solid var(--ink);margin-top:.5rem}
+.letters div{padding:20px 20px 4px 0}
+.letters div + div{padding-left:20px;border-left:1px solid var(--rule)}
+.letters b{display:block;font-family:"Marcellus",Georgia,serif;font-weight:400;font-size:3.4rem;line-height:1;color:var(--ink);margin-bottom:.6rem}
+.letters h3{font-family:"Public Sans",sans-serif;font-weight:600;font-size:1rem;margin-bottom:.25rem}
+.letters p{font-size:.95rem;color:var(--mute)}
+
+.lines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 40px}
+.lines p{font-size:.98rem}
+.note{color:var(--mute);font-size:.95rem;margin-top:1.5rem}
+
+.team{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 48px}
+.person{display:grid;grid-template-columns:104px minmax(0,1fr);gap:20px;align-items:start}
+.person img{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;filter:grayscale(.15)}
+.team .role{color:var(--mute);font-size:.9rem;margin-bottom:.4rem}
+.team .lattes{font-size:.92rem;margin-top:-.25rem}
+.team p{font-size:.98rem}
+
+/* publicações */
+.pubs{width:100%;border-collapse:collapse;font-size:.96rem;margin-bottom:2.5rem}
+.pubs caption{text-align:left;font-family:"Marcellus",Georgia,serif;font-size:1.2rem;color:var(--ink);padding-bottom:.75rem}
+.pubs th{text-align:left;font-weight:600;color:var(--ink);border-bottom:1px solid var(--ink);padding:.5rem .75rem .5rem 0}
+.pubs td{vertical-align:top;border-bottom:1px solid var(--rule);padding:.75rem .75rem .75rem 0}
+.pubs td:first-child{white-space:nowrap;color:var(--mute);width:7.5rem}
+.pubs td:last-child{color:var(--mute);width:32%}
+
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 48px}
+.cols ul{margin:0;padding-left:1.1rem}
+.cols li{margin-bottom:.4rem;font-size:.98rem}
+.cols .soon{color:var(--mute)}
+
+/* como participar */
+.join{background:var(--wash);border-top:none}
+.steps{list-style:none;counter-reset:s;margin:0 0 2.5rem;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.steps li{counter-increment:s;padding:0 24px 0 0}
+.steps li + li{padding-left:24px;border-left:1px solid var(--rule)}
+.steps li::before{content:counter(s);display:block;font-family:"Marcellus",Georgia,serif;font-size:2.4rem;line-height:1;color:var(--ink);margin-bottom:.5rem}
+.steps h3{font-family:"Public Sans",sans-serif;font-weight:600;font-size:1rem}
+.steps p{font-size:.95rem}
+.offer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 48px;margin-bottom:2rem}
+.offer p{font-size:.98rem}
+
+footer{padding:40px 0 56px;color:var(--mute);font-size:.92rem;border-top:1px solid var(--rule)}
+footer p{max-width:none}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:28px;padding-bottom:48px}
+  .hero img{max-width:260px}
+  .letters,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .letters div:nth-child(odd),.steps li:nth-child(3){padding-left:0;border-left:none}
+  .steps li{padding-bottom:24px}
+  .lines{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .person{grid-template-columns:72px minmax(0,1fr);gap:16px}
+  .person img{width:72px;height:72px}
+  .wrap{padding:0 16px}
+  section{padding:48px 0}
+  .letters,.steps,.lines,.team,.cols,.offer{grid-template-columns:1fr}
+  .letters div,.letters div + div,.steps li,.steps li + li{padding-left:0;border-left:none}
+  .pubs,.pubs tbody,.pubs tr,.pubs td{display:block;width:auto}
+  .pubs thead{display:none}
+  .pubs tr{border-bottom:1px solid var(--rule);padding:.6rem 0}
+  .pubs td{border:none;padding:.1rem 0}
+  .pubs td:last-child{width:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top" aria-label="Navegação">
+    <a href="../index.html">Carlos Eduardo Leal de Castro</a>
+    <a href="https://forms.cloud.microsoft/r/0734GmmC1M">Formulário de interesse</a>
+  </nav>
+
+  <header class="hero">
+    <img src="sigma_lab_vetorizado.svg" alt="Logo do SIGMA Lab: a letra sigma em pincelada, com o texto Grupo de Pesquisa, Ibmec São Paulo; Sistemas Inteligentes, IoT, Geometria, Modelagem, Algoritmos" width="557" height="708" />
+    <div>
+      <h1>SIGMA Lab</h1>
+      <p class="lead">Grupo de pesquisa do Ibmec São Paulo que desenvolve e aplica métodos computacionais para entender, modelar e resolver problemas complexos, com problemas teóricos e aplicações interdisciplinares.</p>
+      <p>Alunos de graduação participam por iniciação científica, TCC e projetos colaborativos. O que produzimos é público: publicações, código, dados e parcerias.</p>
+      <a class="cta" href="https://forms.cloud.microsoft/r/0734GmmC1M">Preencher o formulário de interesse</a>
+      <p class="where">Campus Faria Lima, São Paulo</p>
+    </div>
+  </header>
+</div>
+
+<section aria-labelledby="nome">
+  <div class="wrap">
+    <h2 id="nome">O nome</h2>
+    <p>Sistemas Inteligentes, IoT, Geometria, Modelagem e Algoritmos.</p>
+    <div class="letters">
+      <div><b>SI</b><h3>Sistemas Inteligentes</h3><p>Aprendizado de máquina e inteligência artificial.</p></div>
+      <div><b>IoT</b><h3>Internet das Coisas</h3><p>Sensores, dispositivos conectados e sistemas embarcados.</p></div>
+      <div><b>G</b><h3>Geometria</h3><p>Geometria computacional e processamento de geometria.</p></div>
+      <div><b>M</b><h3>Modelagem</h3><p>Modelagem matemática e simulação de sistemas.</p></div>
+      <div><b>A</b><h3>Algoritmos</h3><p>Otimização, métodos numéricos e processamento de sinais.</p></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="linhas">
+  <div class="wrap">
+    <h2 id="linhas">Linhas de pesquisa</h2>
+    <div class="lines">
+      <div><h3>Inteligência artificial</h3><p>Aprendizado de máquina e profundo, modelos de linguagem e agentes.</p></div>
+      <div><h3>Computação musical e áudio</h3><p>Análise e síntese de som, timbre e recuperação de informação musical.</p></div>
+      <div><h3>Geometria computacional</h3><p>Processamento de geometria, malhas 3D e impressão 3D.</p></div>
+      <div><h3>Modelagem e simulação</h3><p>Modelos matemáticos e métodos numéricos para sistemas físicos e complexos.</p></div>
+      <div><h3>Otimização e controle</h3><p>Pesquisa operacional, otimização e controle de sistemas dinâmicos.</p></div>
+      <div><h3>Ciência de dados aplicada</h3><p>Análise e modelagem de dados em finanças, recomendação e outras áreas.</p></div>
+    </div>
+    <p class="note">Alunos também podem propor temas próprios dentro dessas linhas.</p>
+  </div>
+</section>
+
+<section aria-labelledby="equipe">
+  <div class="wrap">
+    <h2 id="equipe">Pesquisadores</h2>
+    <div class="team">
+      <div class="person">
+        <img src="img/carlos.jpg" alt="Foto de Carlos Eduardo Leal de Castro" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>Dr. Carlos Eduardo Leal de Castro</h3>
+          <p class="role">Fundador e coordenador</p>
+        <p>Doutor em Ciência da Computação (IME-USP) e mestre em Matemática (UFSC). Computação musical, timbre, geometria, impressão 3D e IA.</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/6444147380999226">Currículo Lattes</a></p>
+        </div>
+      </div>
+      <div class="person">
+        <img src="img/ulisses.jpg" alt="Foto de Ulisses Alves Maciel Neto" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>Dr. Ulisses Alves Maciel Neto</h3>
+          <p class="role">Pesquisador</p>
+        <p>Doutor em Engenharia Elétrica (USP), com sanduíche na Mines Paris – PSL. Reatores nucleares, controle quântico e métodos numéricos.</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/1852979160426703">Currículo Lattes</a></p>
+        </div>
+      </div>
+      <div class="person">
+        <img src="img/angela.jpg" alt="Foto de Angela Batista Reis" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>MSc. Angela Batista Reis</h3>
+          <p class="role">Pesquisadora</p>
+        <p>Mestra em Informática (UFCG) e doutoranda em Engenharia Elétrica (Mackenzie). Sistemas de informação, programação de computadores, gestão do conhecimento, análise e projeto de sistemas, modelagem UML e POO.</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/4811941175823833">Currículo Lattes</a></p>
+        </div>
+      </div>
+      <div class="person">
+        <img src="img/lufe.jpg" alt="Foto de Luís Fernando Britto Pereira de Mello Barreto" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>Dr. Luís Fernando Britto Pereira de Mello Barreto (Lufe)</h3>
+          <p class="role">Pesquisador</p>
+        <p>Doutor e mestre em Administração de Empresas (FEA-USP). Engenharia de software, business intelligence e data analytics.</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/3700643497813711">Currículo Lattes</a></p>
+        </div>
+      </div>
+      <div class="person">
+        <img src="img/marcel.jpg" alt="Foto de Marcel Stefan Wagner" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>Marcel Stefan Wagner</h3>
+          <p class="role">Pesquisador</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/9782031388762785">Currículo Lattes</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="pesquisas">
+  <div class="wrap">
+    <h2 id="pesquisas">Pesquisas recentes</h2>
+
+    <table class="pubs">
+      <caption>Computação musical e geometria</caption>
+      <thead><tr><th scope="col">Ano</th><th scope="col">Trabalho</th><th scope="col">Autores e veículo</th></tr></thead>
+      <tbody>
+        <tr><td>2026</td><td><a href="https://doi.org/10.5281/zenodo.22775209">Timbre discrimination in drum tom-toms: an approach based on audio descriptors and timbre space</a></td><td>Castro, Queiroz. 4th International Conference on Timbre (Montréal)</td></tr>
+        <tr><td>Em revisão</td><td>Normal-field-based global orientation for support reduction in 3D printing</td><td>Castro, Sacht. Journal of the Brazilian Computer Society</td></tr>
+        <tr><td>2026</td><td><a href="https://doi.org/10.5281/zenodo.22783358">Drum Tom-Tom Timbre Dataset: Acoustic Recordings of Nine Mechanical Configurations under Sixteen Controlled Tuning Conditions</a></td><td>Castro. Dataset, Zenodo</td></tr>
+        <tr><td>2026</td><td><a href="https://doi.org/10.5281/zenodo.22783801">Drum Excitation Apparatus Repeatability Dataset: Thirty Repeated Acoustic Responses of One Tom-Tom under Nominally Identical Conditions</a></td><td>Castro. Dataset, Zenodo</td></tr>
+        <tr><td>2026</td><td><a href="https://doi.org/10.5281/zenodo.23350876">Drum Shell Impact Response Dataset: Acoustic Recordings of Five Isolated Tom-Tom Shells under Controlled Excitation</a></td><td>Castro. Dataset, Zenodo</td></tr>
+      </tbody>
+    </table>
+
+    <table class="pubs">
+      <caption>Modelagem e controle</caption>
+      <thead><tr><th scope="col">Ano</th><th scope="col">Trabalho</th><th scope="col">Autores e veículo</th></tr></thead>
+      <tbody>
+        <tr><td>2026</td><td>Preliminary Validation of the Thermal Hydraulics Module of MOOSE for Research Reactor Applications</td><td>Maciel Neto, Caldas Neto. Springer Proceedings in Mathematics &amp; Statistics</td></tr>
+        <tr><td>2026</td><td>Três trabalhos: estratégia para um código termo-hidráulico bifásico para SMRs; análise termo-hidráulica de SMRs; validação do MOOSE com o reator IEA-R1</td><td>Maciel Neto et al. International Nuclear Atlantic Conference (INAC)</td></tr>
+        <tr><td>2024</td><td>CFD study of a fLOFA in the IAEA 10 MW generic MTR reactor using a 3D analytical heat source term</td><td>Lopes, Maciel Neto et al. Int. Conf. on Electronics, Engineering Physics and Earth Science</td></tr>
+        <tr><td>2022</td><td>Motion planning for an ensemble of Bloch equations towards the south pole with smooth bounded control</td><td>Maciel Neto, Pereira da Silva, Rouchon. Automatica, v. 145</td></tr>
+      </tbody>
+    </table>
+
+    <table class="pubs">
+      <caption>Congressos e eventos</caption>
+      <thead><tr><th scope="col">Ano</th><th scope="col">Evento</th><th scope="col">Participação</th></tr></thead>
+      <tbody>
+        <tr><td>2026</td><td>4th International Conference on Timbre, Montréal</td><td>Apresentação de trabalho</td></tr>
+        <tr><td>2026</td><td>International Nuclear Atlantic Conference (INAC), Rio de Janeiro</td><td>Três trabalhos</td></tr>
+        <tr><td>2025</td><td>International Conference of Industrial and Applied Mathematics (ICoIAM)</td><td>Apresentação de trabalho</td></tr>
+        <tr><td>2025</td><td>Simpósio Brasileiro de Computação Musical (SBCM)</td><td>Organização e revisão</td></tr>
+        <tr><td>2023</td><td>9th International Conference on Modeling, Simulation and Applied Optimization</td><td>Apresentação de trabalho</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cols">
+      <div>
+        <h3>Software</h3>
+        <ul>
+          <li>Timbre Toolbox for Python: reimplementação do Timbre Toolbox (Peeters et al., 2011), em desenvolvimento</li>
+          <li>ibmecstats (2025)</li>
+          <li>THM+, módulo termo-hidráulico (2025)</li>
+          <li>GUARANA, análise de reatores (2026)</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Material didático e cursos</h3>
+        <ul>
+          <li><a href="https://doi.org/10.5281/zenodo.22776420">Apostila Programação para Análise de Dados</a> (2026)</li>
+          <li>Curso Introdução à Linguagem Julia (2026)</li>
+          <li class="soon">Minicurso de LaTeX para escrita acadêmica (2026, em breve)</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Orientações no Ibmec</h3>
+        <ul>
+          <li>2 ICs em andamento: precificação de opções americanas; avaliação empírica de arquiteturas multiagente e multiferramentas</li>
+          <li>2 ICs concluídas em termo-hidráulica nuclear (2024)</li>
+          <li>1 TCC concluído em reconhecimento facial e fraudes (2025)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="join" aria-labelledby="participar">
+  <div class="wrap">
+    <h2 id="participar">Como participar</h2>
+    <p>Podem participar alunos de graduação de todos os cursos do Ibmec São Paulo, como Ciência de Dados e IA, Engenharias de Computação, Software e Produção, e Economia. Python e matemática básica ajudam, mas não são pré-requisito: o conteúdo específico de cada projeto é estudado durante a pesquisa.</p>
+
+    <ol class="steps">
+      <li><h3>Conversa</h3><p>Procure um dos pesquisadores ou preencha o formulário.</p></li>
+      <li><h3>Tema</h3><p>Definição do tema com o orientador.</p></li>
+      <li><h3>Piloto</h3><p>Leituras guiadas e um primeiro experimento.</p></li>
+      <li><h3>IC ou TCC</h3><p>Projeto formal, reuniões semanais e meta de publicação.</p></li>
+    </ol>
+
+    <div class="offer">
+      <div><h3>IC e TCC</h3><p>Projeto de pesquisa orientado por um dos pesquisadores.</p></div>
+      <div><h3>Publicação</h3><p>Submissão a congressos da área, como SBCM, SIBGRAPI e INAC.</p></div>
+      <div><h3>Portfólio</h3><p>Código, dados e resultados documentados.</p></div>
+      <div><h3>Pós-graduação</h3><p>Preparação para mestrado e doutorado, no Brasil ou fora.</p></div>
+    </div>
+
+    <a class="cta" href="https://forms.cloud.microsoft/r/0734GmmC1M">Preencher o formulário de interesse</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>SIGMA Lab, Ibmec São Paulo. Contato: <a href="mailto:carlos.castro@professores.ibmec.edu.br">carlos.castro@professores.ibmec.edu.br</a></p>
+    <p><a href="../index.html">Voltar ao site de Carlos Eduardo Leal de Castro</a></p>
+  </div>
+</footer>
+</body>
+</html>
