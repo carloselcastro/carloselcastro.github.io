@@ -77,6 +77,7 @@ section{padding:64px 0;border-top:1px solid var(--rule)}
 .student summary{cursor:pointer;color:var(--link);font-size:.95rem}
 .student details p{font-size:.96rem;margin-top:.75rem}
 .student .lattes{font-size:.92rem;margin:-.25rem 0 .25rem}
+.student + .student{margin-top:2.75rem}
 .student .kw{color:var(--mute);font-size:.92rem}
 .team .role{color:var(--mute);font-size:.9rem;margin-bottom:.4rem}
 .team .lattes{font-size:.92rem;margin-top:-.25rem}
@@ -232,6 +233,15 @@ footer p{max-width:none}
           <p class="lattes"><a href="http://lattes.cnpq.br/9782031388762785">Currículo Lattes</a></p>
         </div>
       </div>
+      <div class="person">
+        <img src="img/hebert-silva.jpg" alt="Foto de Hebert de Oliveira Silva" width="400" height="400" loading="lazy" />
+        <div>
+          <h3>Dr. Hebert de Oliveira Silva</h3>
+          <p class="role">Pesquisador</p>
+          <p>Doutor e mestre em Tecnologia (Unicamp), na área de Sistemas de Informação e Comunicação. Segurança da informação, segurança cibernética, redes de computadores e governança de TI.</p>
+          <p class="lattes"><a href="http://lattes.cnpq.br/9689028080261016">Currículo Lattes</a></p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -250,6 +260,20 @@ footer p{max-width:none}
           <summary>Resumo</summary>
           <p>A precificação de opções americanas de venda constitui um problema sem solução analítica fechada, em razão do direito de exercício antecipado, o que exige o emprego de métodos numéricos. Este trabalho compara dois métodos de naturezas distintas: o PSOR (Projected Successive Over-Relaxation), que resolve o problema de complementaridade linear derivado da equação de Black-Scholes por diferenças finitas com esquema de Crank-Nicolson, e o LSM (Least Squares Monte Carlo), que estima o valor de continuação da opção por simulação estocástica de trajetórias e regressão por mínimos quadrados. Adotou-se o modelo binomial de Cox-Ross-Rubinstein (CRR) como referência determinística de alta precisão e conduziu-se uma análise de convergência para calibrar os parâmetros de cada método — a resolução da malha no PSOR e o número de trajetórias e passos temporais no LSM —, assegurando comparação sob nível de erro equivalente. Os métodos foram aplicados a uma base real de opções da NVIDIA, no período de 2020 a 2022, com tratamento que incluiu a substituição da volatilidade implícita pela volatilidade histórica realizada. A estrutura do desvio entre preços teóricos e de mercado foi investigada por regressão linear, distinguindo o erro atribuível ao modelo daquele decorrente das condições de mercado. Por fim, os métodos foram comparados quanto à convergência, à precisão, à escalabilidade e ao comportamento frente à dimensionalidade, caracterizando os regimes em que cada abordagem é mais adequada. Conclui-se que nenhum método é universalmente superior e que o desvio frente ao mercado decorre da hipótese de volatilidade constante.</p>
           <p class="kw">Palavras-chave: opções americanas; métodos numéricos; Black-Scholes; regressão por mínimos quadrados.</p>
+        </details>
+      </div>
+    </div>
+    <div class="student">
+      <img src="img/gabriel-pow.jpg" alt="Foto de Gabriel Pow" width="400" height="400" loading="lazy" />
+      <div>
+        <h3>Gabriel Pow</h3>
+        <p class="kind">Iniciação científica. Orientador: Carlos Eduardo Leal de Castro</p>
+        <h4>Avaliação empírica de arquiteturas multiagente e multiferramentas em auditorias de conformidade baseadas na NR-1</h4>
+        <p class="lattes"><a href="https://www.linkedin.com/in/gabriel-pow/">LinkedIn</a></p>
+        <details>
+          <summary>Resumo</summary>
+          <p>Agentes baseados em Modelos de Linguagem de Grande Porte (LLMs) vêm sendo organizados em diferentes topologias, mas há pouca evidência empírica sobre qual delas é mais adequada a tarefas de alta precisão normativa. Este trabalho comparou duas arquiteturas de orquestração, multiagente e multiferramentas, na identificação e fundamentação de não conformidades com a Norma Regulamentadora nº 1 (NR-1), relativa ao Gerenciamento de Riscos Ocupacionais. Ambas foram implementadas sobre o mesmo modelo, Gemini 2.5 Flash, via API, sem ajuste fino e com temperatura zero. A arquitetura multiagente foi composta por três agentes sequenciais (extrator, analista de conformidade e auditor); a multiferramentas, por um único agente com acesso a três funções customizadas que reproduzem o mesmo encadeamento lógico. Foram elaborados três cenários fictícios, cada um com 11 não conformidades inseridas intencionalmente (33 no total), executados três vezes por arquitetura. Os desfechos foram recall, precisão, F1-score e acerto do item normativo citado. A arquitetura multiferramentas identificou as 33 não conformidades, sem falsos positivos, e citou o item correto da NR-1 em todos os casos. A arquitetura multiagente obteve, no agregado, recall de 84,8%, precisão de 87,5%, F1-score de 86,2% e acerto do item normativo de cerca de 65%, com perdas concentradas nos cenários mais abrangentes. Conclui-se que, mantido o modelo, a topologia de orquestração alterou o desempenho, e que preservar o contexto integral pode ser tão relevante quanto decompor a tarefa. Os resultados são preliminares, dada a amostra reduzida e o efeito teto observado.</p>
+          <p class="kw">Palavras-chave: agentes de IA; sistemas multiagente; uso de ferramentas; LLM; NR-1.</p>
         </details>
       </div>
     </div>
