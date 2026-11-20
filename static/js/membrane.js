@@ -246,13 +246,37 @@
         this.analyser.fftSize = 2048;
         comp.connect(this.analyser);
       }
-      if (this.ctx.state === "suspended") this.ctx.resume();
+      if (this.ctx.state !== "running") this.ctx.resume().catch(() => {});
       return this.ctx;
+    }
+    // Mobile browsers only start audio from a completed gesture (pointerup, touchend, click),
+    // not from pointerdown. Call this from such a gesture; it also plays one silent sample,
+    // which older iOS versions need to unlock output.
+    unlock() {
+      // iOS 17+: treat the page as media playback so the ring/silent switch does not mute it
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+      const ctx = this._ensure();
+      if (!ctx || this._unlocked) return;
+      const b = ctx.createBuffer(1, 1, ctx.sampleRate);
+      const s = ctx.createBufferSource();
+      s.buffer = b;
+      s.connect(ctx.destination);
+      s.start(0);
+      if (ctx.state === "running") this._unlocked = true;
+      else ctx.resume().then(() => { this._unlocked = true; }).catch(() => {});
     }
     play(exc, force = 1) {
       if (!this.enabled) return;
       const ctx = this._ensure();
       if (!ctx) return;
+      // still suspended (first touch on a phone): play as soon as the context starts
+      if (ctx.state !== "running") {
+        ctx.resume().then(() => this._schedule(ctx, exc, force)).catch(() => {});
+        return;
+      }
+      this._schedule(ctx, exc, force);
+    }
+    _schedule(ctx, exc, force) {
       const t0 = ctx.currentTime + 0.005;
       const maxA = Math.max(...exc.map((e) => e.amp)) || 1;
       exc.forEach((e) => {

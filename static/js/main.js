@@ -73,6 +73,11 @@
     e.preventDefault();
     strikeAt(e.clientX, e.clientY);
   });
+  // unlock audio on the first completed gesture anywhere on the page (required on phones)
+  const unlockAudio = () => { if (voice.enabled) voice.unlock(); };
+  ["pointerup", "touchend", "click", "keydown"].forEach((t) =>
+    document.addEventListener(t, unlockAudio, { capture: true, passive: true })
+  );
   head.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
